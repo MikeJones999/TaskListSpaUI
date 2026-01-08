@@ -1,8 +1,7 @@
-import React from "react"
 import { createBrowserRouter } from "react-router-dom"
 import App from "../App"
 import Home from "../pages/Home"
-// import Login from "../pages/Login"
+import Login from "../pages/Login"
 // import Register from "../pages/Register"
 // import Dashboard from "../pages/Dashboard"
 // import TaskLists from "../pages/TaskLists"
@@ -15,7 +14,7 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
-    //   { path: "login", element: <Login /> },
+      { path: "login", element: <Login /> },
     //   { path: "register", element: <Register /> },
     //   { path: "dashboard", element: <Dashboard /> },
     //   { path: "tasklists", element: <TaskLists /> },
