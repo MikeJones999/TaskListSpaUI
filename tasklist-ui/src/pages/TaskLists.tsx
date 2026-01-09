@@ -9,6 +9,7 @@ import type { DeleteResponseDto } from '../models/ResponseDtos/DeleteResponseDto
 import DeleteTaskListConfirmationModal from '../components/modals/DeleteTaskListConfirmationModal';
 import EditTaskListModal from '../components/modals/EditTaskListModal';
 import { useNavigate } from 'react-router-dom';
+import EditIconButton from '../components/modals/EditIconButton';
 
 
 interface ResponseDto {
@@ -109,9 +110,10 @@ export default function TaskLists() {
                         className="mb-4 w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-md shadow transition-all uppercase tracking-wide text-xs sm:text-sm">
                         Create Task List
                     </button>
-                    <div className="relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 w-full">
-                        <nav className="flex w-full flex-col gap-1 p-2 sm:p-3">
-                            {taskLists.length > 0 && taskLists.map(taskList => (
+                    {taskLists.length > 0 && taskLists.map(taskList => (
+                        <div className="relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 w-full">
+                            <nav className="flex w-full flex-col gap-1 p-2 sm:p-3">
+
                                 <div
                                     key={taskList.id}
                                     role="button"
@@ -126,7 +128,7 @@ export default function TaskLists() {
                                     </span>
 
 
-                                    <button
+                                    {/* <button
                                         className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                         type="button"
                                         onClick={() => handleEdit(taskList.id)}
@@ -136,7 +138,8 @@ export default function TaskLists() {
                                             <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                                             <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
                                         </svg>
-                                    </button>
+                                    </button> */}
+                                    <EditIconButton id={taskList.id} label="Edit task list" onClick={handleEdit} />
                                     <button
                                         className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                         type="button"
@@ -148,9 +151,10 @@ export default function TaskLists() {
                                         </svg>
                                     </button>
                                 </div>
-                            ))}
-                        </nav>
-                    </div>
+                            </nav>
+                        </div>
+                    ))}
+
                 </div>
             </div>
         </>

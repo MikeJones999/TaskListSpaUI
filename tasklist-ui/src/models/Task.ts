@@ -3,4 +3,7 @@ export interface Task {
     title: string;
     status: number;
     priority: number;
+    description: string;
+    type: string;
+    toDoListId: number;
 }

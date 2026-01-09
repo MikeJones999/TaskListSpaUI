@@ -3,7 +3,7 @@ import type { TaskList } from "../../models/Tasklist";
 import { apiRequest } from "../../services/apiService";
 import { tokenService } from "../../services/tokenServices";
 import toast from "react-hot-toast";
-import type { EditDeleteModalConfrimationProps } from "../../models/EditDeleteModalConfrimationProps";
+import type { EditDeleteTaskListModalConfrimationProps } from "../../models/EditDeleteTaskListModalConfrimationProps";
 
 
 interface ResponseDto {
@@ -12,7 +12,7 @@ interface ResponseDto {
     message: string;
 }
 
-export default function EditTaskListModal({ item, onClose, onSuccess: onSuccessRefreshLists }: EditDeleteModalConfrimationProps) {
+export default function EditTaskListModal({ item, onClose, onSuccess: onSuccessRefreshLists }: EditDeleteTaskListModalConfrimationProps) {
 
     const [formData, setFormData] = useState<Partial<TaskList>>({
         title: item.title,

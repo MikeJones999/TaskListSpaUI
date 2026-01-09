@@ -1,12 +1,12 @@
 import type { DeleteResponseDto } from '../../models/ResponseDtos/DeleteResponseDto';
-import type { EditDeleteModalConfrimationProps } from "../../models/EditDeleteModalConfrimationProps";
+import type { EditDeleteTaskListModalConfrimationProps } from "../../models/EditDeleteTaskListModalConfrimationProps";
 import { useEffect } from 'react';
 import { apiRequest } from '../../services/apiService';
 import { tokenService } from '../../services/tokenServices';
 import toast from 'react-hot-toast';
 
 
-export default function DeleteTaskListConfirmationModal({ onClose, onSuccess: onSuccessRefreshLists, item }: EditDeleteModalConfrimationProps) {
+export default function DeleteTaskListConfirmationModal({ onClose, onSuccess: onSuccessRefreshLists, item }: EditDeleteTaskListModalConfrimationProps) {
 
     useEffect(() => {
     }, [onClose]);
