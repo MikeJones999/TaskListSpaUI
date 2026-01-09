@@ -24,7 +24,7 @@ export default function Login() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        console.log("Form submitted:", formData)
+        //console.log("Form submitted:", formData)
         try {
                 const result = await apiRequest<LoginResponse>("AuthInitiate/login", { 
                     method: "POST",
@@ -32,7 +32,7 @@ export default function Login() {
                     skipErrorHandling: true
                  });
 
-                console.log("Login response:", result)   
+                //console.log("Login response:", result)   
                   
                 if (result.isAuthorised) {
                     setFormData({ email: "", password: "" });   
@@ -41,11 +41,11 @@ export default function Login() {
                     navigate("/dashboard");
                 }
                 else{
-                    console.log("Login failed - showing error toast");
+                    //console.log("Login failed - showing error toast");
                     toast.error("Invalid email or password.");
                 }
             } catch (error: any) {
-                console.error("Login error:", error);
+                //console.error("Login error:", error);
                 toast.error("An error occurred. Please try again.");
             }   
         }
