@@ -8,6 +8,8 @@ import type { TaskList } from "../models/Tasklist";
 import type { DeleteResponseDto } from '../models/ResponseDtos/DeleteResponseDto';
 import DeleteTaskListConfirmationModal from '../components/modals/DeleteTaskListConfirmationModal';
 import EditTaskListModal from '../components/modals/EditTaskListModal';
+import { useNavigate } from 'react-router-dom';
+import EditIconButton from '../components/modals/EditIconButton';
 
 
 interface ResponseDto {
@@ -22,20 +24,18 @@ export default function TaskLists() {
     const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
-
     const [selectedTaskList, setSelectedTaskList] = useState<TaskList | null>(null);
 
+    const navigate = useNavigate();
     const getTaskLists = async () => {
         try {
             const token = tokenService.getAccessToken();
-            console.log("Using token:", token);
             const data = await apiRequest<ResponseDto>("ToDoLists", { method: "GET", token: token || undefined });
-            console.log("returned data", data);
             if (data.success && data.responseData) {
                 setTaskLists(data.responseData);
             }
         } catch (error) {
-            console.error("Error fetching task lists:", error);
+            console.error("Error fetching task lists:", error);            
         }
     };
 
@@ -63,30 +63,25 @@ export default function TaskLists() {
                 getTaskLists();
             }
             catch (error) {
-                console.error("Error deleting task list:", error);
                 toast.error("An error occurred. Please try again.");
                 return;
             }
         }
-
-        console.log("Delete task list with ID:", id);
     }
 
     const handleEdit = async (id: number) => {
         const taskFound = taskLists.find(tl => tl.id === id);
-        console.log("Edit task list with ID:", id);
         setSelectedTaskList(taskFound || null);
         setShowEditModal(true);
     }
 
 
     const handleNavigation = (id: number) => {
-        console.log("Navigate to task list with ID:", id);
+        navigate(`/Tasks/${id}`);
     }
 
 
-    const handleCreateTaskModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-        event.preventDefault();
+    const handleCreateTaskModal = (): void => {
         setShowCreateModal(true);
     }
 
@@ -107,11 +102,11 @@ export default function TaskLists() {
                         className="mb-4 w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-md shadow transition-all uppercase tracking-wide text-xs sm:text-sm">
                         Create Task List
                     </button>
-                    <div className="relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 w-full">
-                        <nav className="flex w-full flex-col gap-1 p-2 sm:p-3">
-                            {taskLists.length > 0 && taskLists.map(taskList => (
+                    {taskLists.length > 0 && taskLists.map(taskList => (
+                        <div key={taskList.id} className="relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 w-full mb-3">
+                            <nav className="flex w-full flex-col gap-1 p-2 sm:p-3">
+
                                 <div
-                                    key={taskList.id}
                                     role="button"
                                     className="text-slate-800 flex w-full items-center rounded-md p-2 sm:p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 gap-2"
                                 >
@@ -123,18 +118,7 @@ export default function TaskLists() {
                                         <span className="block sm:inline text-xs sm:text-sm text-slate-600 mt-1 sm:mt-0">Tasks - {taskList.toDoItemCount}</span>
                                     </span>
 
-
-                                    <button
-                                        className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                        type="button"
-                                        onClick={() => handleEdit(taskList.id)}
-                                        aria-label="Edit task list"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
-                                            <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
-                                            <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
-                                        </svg>
-                                    </button>
+                                    <EditIconButton id={taskList.id} label="Edit task list" onClick={handleEdit} />
                                     <button
                                         className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                         type="button"
@@ -146,9 +130,10 @@ export default function TaskLists() {
                                         </svg>
                                     </button>
                                 </div>
-                            ))}
-                        </nav>
-                    </div>
+                            </nav>
+                        </div>
+                    ))}
+
                 </div>
             </div>
         </>

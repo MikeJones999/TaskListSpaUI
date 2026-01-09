@@ -1,6 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? "https://localhost:7082/api/";
 
-export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 export interface ApiOptions {
   method?: HttpMethod;
