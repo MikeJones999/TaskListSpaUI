@@ -62,8 +62,8 @@ export default function CreateTaskListModal({ onClose, onSuccess: onSuccessRefre
 
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Create Task List</h2>
+                <div className="flex justify-between items-center mb-6">       
+                    <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-800">Create Task List</h2>
                     <button
                         onClick={onClose}
                         className="text-slate-400 hover:text-slate-600 transition-colors"
@@ -110,19 +110,19 @@ export default function CreateTaskListModal({ onClose, onSuccess: onSuccessRefre
 
                    
                     <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+                         <button
+                            type="submit"
+                            className="w-full sm:w-auto px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-md transition-colors font-medium shadow"
+                        >
+                            Create
+                        </button>
                         <button
                             type="button"
                             onClick={onClose}
                             className="w-full sm:w-auto px-4 py-2 border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50 transition-colors font-medium"
                         >
                             Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            className="w-full sm:w-auto px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-md transition-colors font-medium shadow"
-                        >
-                            Create Task List
-                        </button>
+                        </button>                       
                     </div>
                 </form>
             </div>
