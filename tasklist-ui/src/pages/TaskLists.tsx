@@ -8,6 +8,7 @@ import type { TaskList } from "../models/Tasklist";
 import type { DeleteResponseDto } from '../models/ResponseDtos/DeleteResponseDto';
 import DeleteTaskListConfirmationModal from '../components/modals/DeleteTaskListConfirmationModal';
 import EditTaskListModal from '../components/modals/EditTaskListModal';
+import { useNavigate } from 'react-router-dom';
 
 
 interface ResponseDto {
@@ -22,9 +23,9 @@ export default function TaskLists() {
     const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
-
     const [selectedTaskList, setSelectedTaskList] = useState<TaskList | null>(null);
 
+    const navigate = useNavigate();
     const getTaskLists = async () => {
         try {
             const token = tokenService.getAccessToken();
@@ -82,6 +83,7 @@ export default function TaskLists() {
 
     const handleNavigation = (id: number) => {
         console.log("Navigate to task list with ID:", id);
+        navigate(`/Tasks/${id}`);
     }
 
 

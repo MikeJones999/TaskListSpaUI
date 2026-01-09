@@ -23,6 +23,8 @@ export default function EditTaskListModal({ item, onClose, onSuccess: onSuccessR
     }, [onClose]);
 
     const handleSubmit = async (e: React.FormEvent) => {
+
+        //TODO store the original state - compare with new state - if no changes made, just close the modal
         e.preventDefault();
 
         try {
