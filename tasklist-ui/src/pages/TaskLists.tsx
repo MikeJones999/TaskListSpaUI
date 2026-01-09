@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { apiRequest } from "../services/apiService";
 import { tokenService } from "../services/tokenServices";
-import CreateTaskListModal from '../components/CreateTaskListModal';
+import CreateTaskListModal from '../components/modals/CreateTaskListModal';
 import toast from "react-hot-toast"
 import ToastWrapper from "../components/toastWrapper";
 import type { TaskList } from "../models/Tasklist";
+import type { DeleteResponseDto } from '../models/ResponseDtos/DeleteResponseDto';
+import DeleteTaskListConfirmationModal from '../components/modals/DeleteTaskListConfirmationModal';
 
 
 interface ResponseDto {
@@ -16,7 +18,9 @@ interface ResponseDto {
 export default function TaskLists() {
 
     const [taskLists, setTaskLists] = useState<TaskList[]>([]);
-    const [showModal, setShowModal] = useState<boolean>(false);
+    const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+    const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+    const [selectedTaskListId, setSelectedTaskListId] = useState<number | null>(null);
 
     const getTaskLists = async () => {
         try {
@@ -39,17 +43,25 @@ export default function TaskLists() {
     const handleDelete = async (id: number) => {
         const taskFound = taskLists.find(tl => tl.id === id);
         if(taskFound?.toDoItemCount && taskFound.toDoItemCount > 0){
-            toast.error("Remove all child tasks before deleting.");
-            console.log("Cannot delete task list with existing tasks.");
+            // toast.error("Remove all child tasks before deleting.");
+            // console.log("Cannot delete task list with existing tasks.");
+            setSelectedTaskListId(id);
+            setShowDeleteModal(true);
             //open a modal here probably and confirm deletion and let api delete all 
-            return;
+            
         }
         else{
-
             try{
-                
+                const result = await apiRequest<DeleteResponseDto>(`ToDoLists/${id}`, { 
+                    method: "DELETE", 
+                    token: tokenService.getAccessToken() || undefined
+                });
+                if(!result.success){
+                    toast.error("Failed to delete task list: " + result.message);
+                    return;
+                }
                 toast.success("Task list deleted successfully!");
-
+                getTaskLists();
             }
             catch(error){
                 console.error("Error deleting task list:", error);
@@ -69,13 +81,15 @@ export default function TaskLists() {
 
     const handleCreateTaskModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
         event.preventDefault();
-        setShowModal(true);
+        setShowCreateModal(true);
     }
 
     return ( 
         <>
         <ToastWrapper />
-        {showModal && <CreateTaskListModal onClose={() => setShowModal(false)} onSuccess={getTaskLists} />}
+        {showCreateModal && <CreateTaskListModal onClose={() => setShowCreateModal(false)} onSuccess={getTaskLists} />}
+        {showDeleteModal && selectedTaskListId && <DeleteTaskListConfirmationModal itemId={selectedTaskListId} onClose={() => setShowDeleteModal(false)} onSuccess={getTaskLists} />}
+
         <div className="flex justify-center mt-4 sm:mt-6 md:mt-8 mb-4 px-4">
             <p className="text-base sm:text-lg md:text-xl font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-teal-300 text-center">Task Lists</p>
         </div>

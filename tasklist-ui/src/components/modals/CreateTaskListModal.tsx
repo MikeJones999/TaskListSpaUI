@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
-import type { TaskList } from "../models/Tasklist";
-import { apiRequest } from "../services/apiService";
-import { tokenService } from "../services/tokenServices";
+import type { TaskList } from "../../models/Tasklist";
+import { apiRequest } from "../../services/apiService";
+import { tokenService } from "../../services/tokenServices";
 import toast from "react-hot-toast";
-
-interface CreateTaskListModalProps {
-    onClose: () => void;
-    onSuccess: () => void;
-}
+import type { ConfirmationModalProps } from "../../models/ConfirmationModalProps";
 
 interface ResponseDto {
     responseData: TaskList;
@@ -15,7 +11,7 @@ interface ResponseDto {
     message: string;
 }   
 
-export default function CreateTaskListModal({ onClose, onSuccess: onSuccessRefreshLists }: CreateTaskListModalProps) {
+export default function CreateTaskListModal({ onClose, onSuccess: onSuccessRefreshLists }: ConfirmationModalProps) {
 
     const [formData, setFormData] = useState<Partial<TaskList>>({
         title: "",
