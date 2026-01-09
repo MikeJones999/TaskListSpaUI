@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import toast from "react-hot-toast"
 import ToastWrapper from "../components/toastWrapper";
 import { useEffect, useState } from 'react';
@@ -23,6 +23,7 @@ interface ResponseDto {
 export default function Tasks() {
 
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [taskList, setTaskList] = useState<TaskList | null>(null);
     const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
@@ -34,14 +35,13 @@ export default function Tasks() {
     const getTaskList = async () => {
         try {
             const token = tokenService.getAccessToken();
-            console.log("Using token:", token);
             const data = await apiRequest<ResponseDto>(`ToDoLists/${id}`, { method: "GET", token: token || undefined });
-            console.log("returned data", data);
             if (data.success && data.responseData) {
                 setTaskList(data.responseData);
             }
         } catch (error) {
-            console.error("Error fetching task lists:", error);
+            console.error("Error fetching task list:", error);
+            navigate('/TaskLists');
         }
     };
 
@@ -50,9 +50,6 @@ export default function Tasks() {
     }, []);
 
     const handleDelete = async (id: number) => {
-        const taskFound = taskList?.tasks.find(tl => tl.id === id);
-        console.log("Delete task found", taskFound);
-
         try {
             const result = await apiRequest<DeleteResponseDto>(`ToDoItems/${id}`, {
                 method: "DELETE",
@@ -66,11 +63,9 @@ export default function Tasks() {
             getTaskList();
         }
         catch (error) {
-            console.error("Error deleting task:", error);
             toast.error("An error occurred. Please try again.");
             return;
         }
-        console.log("Delete task with ID:", id);
     }
 
     const handleEdit = async (id: number) => {
@@ -79,9 +74,7 @@ export default function Tasks() {
         setShowEditModal(true);
     }
 
-    const handleCreateTaskModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-        event.preventDefault();
-        console.log("Open create task modal");
+    const handleCreateTaskModal = (): void => {
         setShowCreateModal(true);
     }
 
