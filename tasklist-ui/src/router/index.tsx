@@ -1,22 +1,29 @@
 import { createBrowserRouter } from "react-router-dom"
-import App from "../App"
+import Layout from "../Layout"
 import Home from "../pages/Home"
 import Login from "../pages/Login"
+import Logout from "../pages/Logout"
 // import Register from "../pages/Register"
-// import Dashboard from "../pages/Dashboard"
+import Dashboard from "../pages/Dashboard"
 // import TaskLists from "../pages/TaskLists"
 // import TaskListDetail from "../pages/TaskListDetail"
 // import UserProfile from "../pages/UserProfile"
+import ProtectedRoute from "../components/ProtectedRoute"
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <Layout />,
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
     //   { path: "register", element: <Register /> },
-    //   { path: "dashboard", element: <Dashboard /> },
+     { element: <ProtectedRoute />, 
+      children: [ 
+        { path: "dashboard", element: <Dashboard /> },
+        { path: "logout", element: <Logout /> },
+         // add more protected routes here later
+     ] }
     //   { path: "tasklists", element: <TaskLists /> },
     //   { path: "tasklists/:id", element: <TaskListDetail /> },
     //   { path: "profile", element: <UserProfile /> }

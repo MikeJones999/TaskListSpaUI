@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom"
 import { useState } from "react"
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { isLoggedIn } = useAuth();
 
   return (
     <nav className="fixed inset-x-0 top-0 z-50 bg-gradient-to-r from-blue-300 via-blue-500 to-blue-700">
       <div className="mx-auto max-w-screen-2xl h-20 flex items-center justify-between px-4 md:px-8">
         {/* Logo/Brand */}
         <Link to="/" className="text-white font-bold text-xl md:text-2xl">
-          TaskList
+          Task Manager
         </Link>
 
         {/* Desktop Navigation - hidden on mobile */}
@@ -22,23 +24,31 @@ export default function Navbar() {
           </Link>
           <Link to="/tasklists" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
             Tasklists
-          </Link>
-          <Link to="/profile" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
-            Profile
-          </Link>
+          </Link>   
         </div>
 
         {/* Desktop Auth Links - hidden on mobile */}
         <div className="hidden md:flex items-center gap-6">
-          <Link to="/login" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
-            Login
-          </Link>
-          <Link to="/register" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
-            Register
-          </Link>
-          <button className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
-            Logout
-          </button>
+          {!isLoggedIn && (
+            <>
+              <Link to="/login" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+                Login
+              </Link>
+              <Link to="/register" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+                Register
+              </Link>
+            </>
+          )}
+          {isLoggedIn && (
+            <>
+              <Link to="/profile" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+                User Profile
+              </Link>
+               <Link to="/logout" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+                Logout
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Hamburger Button */}
