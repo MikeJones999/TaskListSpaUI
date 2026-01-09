@@ -20,7 +20,7 @@ export default function Login() {
  
     const [formData, setFormData] = useState<LoginFormData>({ email: "", password: "" })
     const navigate = useNavigate();
-    const { login } = useAuth() // ← use AuthContext login()
+    const { login } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -37,7 +37,7 @@ export default function Login() {
                 if (result.isAuthorised) {
                     setFormData({ email: "", password: "" });   
                     login(result.token, result.refreshToken);
-                    toast.success("Login successful!"); // ← Changed from toast.error
+                    toast.success("Login successful!");
                     navigate("/dashboard");
                 }
                 else{
