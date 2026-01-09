@@ -28,6 +28,8 @@ export default function Tasks() {
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [openStatusDropdown, setOpenStatusDropdown] = useState<number | null>(null);
+    const [openPriorityDropdown, setOpenPriorityDropdown] = useState<number | null>(null);
 
     const getTaskList = async () => {
         try {
@@ -95,6 +97,60 @@ export default function Tasks() {
         setShowCreateModal(true);
     }
 
+    const handleEditStatus = async (taskId: number, newStatus: number): Promise<void> => {
+        try {
+            // const token = tokenService.getAccessToken();
+            // const result = await apiRequest<DeleteResponseDto>(`ToDoLists/${id}/tasks/${taskId}/status`, {
+            //     method: "PATCH",
+            //     token: token || undefined,
+            //     body: { status: newStatus }
+            // });
+
+            // if (!result.success) {
+            //     toast.error("Failed to update task status: " + result.message);
+            //     return;
+            // }
+
+            toast.success("Task status updated successfully!");
+            setOpenStatusDropdown(null);
+            getTaskList();
+        } catch (error) {
+            console.error("Error updating task status:", error);
+            toast.error("An error occurred. Please try again.");
+        }
+    }
+
+    const toggleStatusDropdown = (taskId: number) => {
+        setOpenStatusDropdown(openStatusDropdown === taskId ? null : taskId);
+    }
+
+    const handleEditPriority = async (taskId: number, newPriority: number): Promise<void> => {
+        try {
+            // const token = tokenService.getAccessToken();
+            // const result = await apiRequest<DeleteResponseDto>(`ToDoLists/${id}/tasks/${taskId}/priority`, {
+            //     method: "PATCH",
+            //     token: token || undefined,
+            //     body: { priority: newPriority }
+            // });
+
+            // if (!result.success) {
+            //     toast.error("Failed to update task priority: " + result.message);
+            //     return;
+            // }
+
+            toast.success("Task priority updated successfully!");
+            setOpenPriorityDropdown(null);
+            getTaskList();
+        } catch (error) {
+            console.error("Error updating task priority:", error);
+            toast.error("An error occurred. Please try again.");
+        }
+    }
+
+    const togglePriorityDropdown = (taskId: number) => {
+        setOpenPriorityDropdown(openPriorityDropdown === taskId ? null : taskId);
+    }
+
     return (
         <>
             <div>
@@ -122,15 +178,49 @@ export default function Tasks() {
                                         className="text-slate-800 flex w-full items-center rounded-md p-2 sm:p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 gap-2"
                                     >
                                         <button
-                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none relative"
                                             type="button"
-                                            onClick={() => handleEdit(task.id)}
-                                            aria-label="Edit task priority"                                        >
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                togglePriorityDropdown(task.id);
+                                            }}
+                                            aria-label="Edit task priority"
+                                        >
                                             <span className="block sm:inline mt-1 sm:mt-0">
                                                 <span className={`inline-flex items-center px-2 py-1 rounded-md text-sm font-medium ${getPriorityInfo(task.priority).color} ${getPriorityInfo(task.priority).bgColor}`}>
                                                     {getPriorityInfo(task.priority).text}
                                                 </span>
                                             </span>
+
+                                            {openPriorityDropdown === task.id && (
+                                                <div className="absolute left-0 top-full mt-1 z-50 bg-white rounded-md shadow-lg border border-slate-200 py-1 min-w-[120px]"
+                                                    onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors"
+                                                        onClick={() => handleEditPriority(task.id, 1)}
+                                                    >
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityInfo(1).color} ${getPriorityInfo(1).bgColor}`}>
+                                                            {getPriorityInfo(1).text}
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors"
+                                                        onClick={() => handleEditPriority(task.id, 2)}
+                                                    >
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityInfo(2).color} ${getPriorityInfo(2).bgColor}`}>
+                                                            {getPriorityInfo(2).text}
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors"
+                                                        onClick={() => handleEditPriority(task.id, 3)}
+                                                    >
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getPriorityInfo(3).color} ${getPriorityInfo(3).bgColor}`}>
+                                                            {getPriorityInfo(3).text}
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            )}
                                         </button>
 
                                         <span className="flex-1 break-words text-sm sm:text-base cursor-pointer" onClick={() => handleNavigation(task.id)}>
@@ -139,15 +229,49 @@ export default function Tasks() {
                                         </span>
 
                                         <button
-                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none relative"
                                             type="button"
-                                            onClick={() => handleEdit(task.id)}
-                                            aria-label="Edit task status"                                        >
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleStatusDropdown(task.id);
+                                            }}
+                                            aria-label="Edit task status"
+                                        >
                                             <span className="block sm:inline mt-1 sm:mt-0">
                                                 <span className={`inline-flex items-center px-2 py-1 rounded-md text-sm font-medium ${getStatusInfo(task.status).color} ${getStatusInfo(task.status).bgColor}`}>
                                                     {getStatusInfo(task.status).text}
                                                 </span>
                                             </span>
+
+                                            {openStatusDropdown === task.id && (
+                                                <div className="absolute right-0 top-full mt-1 z-50 bg-white rounded-md shadow-lg border border-slate-200 py-1 min-w-[140px]"
+                                                    onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors"
+                                                        onClick={() => handleEditStatus(task.id, 1)}
+                                                    >
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getStatusInfo(1).color} ${getStatusInfo(1).bgColor}`}>
+                                                            {getStatusInfo(1).text}
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors"
+                                                        onClick={() => handleEditStatus(task.id, 2)}
+                                                    >
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getStatusInfo(2).color} ${getStatusInfo(2).bgColor}`}>
+                                                            {getStatusInfo(2).text}
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors"
+                                                        onClick={() => handleEditStatus(task.id, 3)}
+                                                    >
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getStatusInfo(3).color} ${getStatusInfo(3).bgColor}`}>
+                                                            {getStatusInfo(3).text}
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            )}
                                         </button>
 
                                         <button
