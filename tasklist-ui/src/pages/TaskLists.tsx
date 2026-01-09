@@ -20,7 +20,7 @@ export default function TaskLists() {
     const [taskLists, setTaskLists] = useState<TaskList[]>([]);
     const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-    const [selectedTaskListId, setSelectedTaskListId] = useState<number | null>(null);
+    const [selectedTaskList, setSelectedTaskList] = useState<TaskList | null>(null);
 
     const getTaskLists = async () => {
         try {
@@ -45,7 +45,7 @@ export default function TaskLists() {
         if(taskFound?.toDoItemCount && taskFound.toDoItemCount > 0){
             // toast.error("Remove all child tasks before deleting.");
             // console.log("Cannot delete task list with existing tasks.");
-            setSelectedTaskListId(id);
+            setSelectedTaskList(taskFound);
             setShowDeleteModal(true);
             //open a modal here probably and confirm deletion and let api delete all 
             
@@ -88,7 +88,7 @@ export default function TaskLists() {
         <>
         <ToastWrapper />
         {showCreateModal && <CreateTaskListModal onClose={() => setShowCreateModal(false)} onSuccess={getTaskLists} />}
-        {showDeleteModal && selectedTaskListId && <DeleteTaskListConfirmationModal itemId={selectedTaskListId} onClose={() => setShowDeleteModal(false)} onSuccess={getTaskLists} />}
+        {showDeleteModal && selectedTaskList && <DeleteTaskListConfirmationModal item={selectedTaskList} onClose={() => setShowDeleteModal(false)} onSuccess={getTaskLists} />}
 
         <div className="flex justify-center mt-4 sm:mt-6 md:mt-8 mb-4 px-4">
             <p className="text-base sm:text-lg md:text-xl font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-teal-300 text-center">Task Lists</p>
