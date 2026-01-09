@@ -1,7 +1,8 @@
 
 import type { ConfirmationModalProps } from "./ConfirmationModalProps";
-import type { TaskList } from "./Tasklist";
+import type { Task } from "./Task";
 
 export interface EditDeleteTaskModalConfrimationProps extends ConfirmationModalProps {
-    item: TaskList | null;   
+    item: Task;  
+    listId: number; 
 }

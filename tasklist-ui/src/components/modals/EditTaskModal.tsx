@@ -1,28 +1,23 @@
 import { useEffect, useState } from "react";
+import type { EditDeleteTaskModalConfrimationProps } from "../../models/EditDeleteTaskModalConfrimationProps";
 import type { Task } from "../../models/Task";
 import { tokenService } from "../../services/tokenServices";
-import PriorityDropdown from "../PriorityDropdown";
 import { apiRequest } from "../../services/apiService";
 import toast from "react-hot-toast";
-import type { EditDeleteTaskListModalConfrimationProps } from "../../models/EditDeleteTaskListModalConfrimationProps";
+import PriorityDropdown from "../PriorityDropdown";
 import type { TaskRelatedResponseDto } from "../../models/ResponseDtos/TaskRelatedResponseDto";
 
-
-
-export default function CreateTaskModal({ onClose, onSuccess: onSuccessRefreshLists, item }: EditDeleteTaskListModalConfrimationProps) {
+export default function EditTaskModal({ item, listId, onClose, onSuccess: onSuccessRefreshLists }: EditDeleteTaskModalConfrimationProps) {
     {
-
         const [formData, setFormData] = useState<Partial<Task>>({
-            "title": "",
-            "description": "",
-            "type": "",
-            "status": 1,
-            "priority": 1,
-            "toDoListId": item?.id || 0
+            title: item.title,
+            description: item.description,
+            type: item.type,
+            status: item.status,
+            priority: item.priority,
+            toDoListId: listId,
+            id: item.id
         });
-
-        useEffect(() => {
-        }, [onClose]);
 
 
         const handleSubmit = async (e: React.FormEvent) => {
@@ -33,8 +28,8 @@ export default function CreateTaskModal({ onClose, onSuccess: onSuccessRefreshLi
                 console.log("Using token:", token);
                 console.log("Form data to submit:", formData);
 
-                const response = await apiRequest<TaskRelatedResponseDto>("ToDoItems", {
-                    method: "POST",
+                const response = await apiRequest<TaskRelatedResponseDto>(`ToDoItems/${item.id}`, {
+                    method: "PUT",
                     token: token || undefined,
                     body: {
                         title: formData.title,
@@ -42,27 +37,30 @@ export default function CreateTaskModal({ onClose, onSuccess: onSuccessRefreshLi
                         type: formData.type,
                         status: formData.status,
                         priority: formData.priority,
-                        toDoListId: formData.toDoListId
+                        id: item.id,
+                        toDoListId: listId
                     }
                 });
 
                 if (!response.success) {
-                    toast.error("Failed to create task: " + response.message);
+                    toast.error("Failed to update task: " + response.message);
                     return;
                 }
 
                 console.log("Response:", response);
-                toast.success("Task created successfully!");
+                toast.success("Task updated successfully!");
                 await onSuccessRefreshLists();
                 onClose();
             } catch (error) {
-                console.error("Error creating task:", error);
+                console.error("Error updating task:", error);
                 toast.error("An error occurred. Please try again.");
             }
         };
 
-        return (
+        useEffect(() => {
+        }, [onClose]);
 
+        return (
             <>
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -72,7 +70,7 @@ export default function CreateTaskModal({ onClose, onSuccess: onSuccessRefreshLi
                 <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-800">Create Task</h2>
+                            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-800">Update Task</h2>
                             <button
                                 onClick={onClose}
                                 className="text-slate-400 hover:text-slate-600 transition-colors"
@@ -133,7 +131,7 @@ export default function CreateTaskModal({ onClose, onSuccess: onSuccessRefreshLi
                                     type="submit"
                                     className="w-full sm:w-auto px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-md transition-colors font-medium shadow"
                                 >
-                                    Create
+                                    Update
                                 </button>
                                 <button
                                     type="button"
@@ -147,7 +145,10 @@ export default function CreateTaskModal({ onClose, onSuccess: onSuccessRefreshLi
                     </div>
                 </div>
             </>
-
         );
+
     }
 }
+
+
+

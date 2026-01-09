@@ -7,11 +7,12 @@ import type { Task } from "../models/Task";
 import { tokenService } from '../services/tokenServices';
 import { apiRequest } from "../services/apiService";
 import type { DeleteResponseDto } from '../models/ResponseDtos/DeleteResponseDto';
-import { useNavigate } from 'react-router-dom';
 import { getStatusInfo } from '../utils/statusHelper';
 import PriorityDropdown from '../components/PriorityDropdown';
 import EditIconButton from '../components/modals/EditIconButton';
 import CreateTaskModal from '../components/modals/CreateTaskModal';
+import EditTaskModal from '../components/modals/EditTaskModal';
+import type { TaskRelatedResponseDto } from '../models/ResponseDtos/TaskRelatedResponseDto';
 
 interface ResponseDto {
     responseData: TaskList;
@@ -22,11 +23,9 @@ interface ResponseDto {
 export default function Tasks() {
 
     const { id } = useParams();
-    const navigate = useNavigate();
 
     const [taskList, setTaskList] = useState<TaskList | null>(null);
     const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
-    const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [openStatusDropdown, setOpenStatusDropdown] = useState<number | null>(null);
@@ -52,8 +51,8 @@ export default function Tasks() {
 
     const handleDelete = async (id: number) => {
         const taskFound = taskList?.tasks.find(tl => tl.id === id);
-        console.log("Delete task found", taskFound);    
-       
+        console.log("Delete task found", taskFound);
+
         try {
             const result = await apiRequest<DeleteResponseDto>(`ToDoItems/${id}`, {
                 method: "DELETE",
@@ -71,50 +70,52 @@ export default function Tasks() {
             toast.error("An error occurred. Please try again.");
             return;
         }
-        
-
         console.log("Delete task with ID:", id);
     }
 
     const handleEdit = async (id: number) => {
-        const taskFound = taskList?.tasks.find(tl => tl.id === id);
-        console.log("Edit task list with ID:", id);
+        const taskFound = taskList?.tasks.find(tl => tl.id === id);       
         setSelectedTask(taskFound || null);
         setShowEditModal(true);
     }
 
-
-    const handleNavigation = (id: number) => {
-        console.log("Navigate to task list with ID:", id);
-        navigate(`/Tasks/${id}`);
-    }
-
-
     const handleCreateTaskModal = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-        event.preventDefault();       
-        console.log("Open create task modal"); 
+        event.preventDefault();
+        console.log("Open create task modal");
         setShowCreateModal(true);
     }
 
-    const handleEditStatus = async (taskId: number, newStatus: number): Promise<void> => {
+    const handleEditStatusPriority = async (taskId: number, newStatus: number, isPriority: boolean): Promise<void> => {
+        const target = isPriority ? "priority" : "status";
         try {
-            // const token = tokenService.getAccessToken();
-            // const result = await apiRequest<DeleteResponseDto>(`ToDoLists/${id}/tasks/${taskId}/status`, {
-            //     method: "PATCH",
-            //     token: token || undefined,
-            //     body: { status: newStatus }
-            // });
+            if (isPriority) {
+                if (taskList?.tasks.find(x => x.id === taskId)?.priority === newStatus) {
+                    setOpenStatusDropdown(null);
+                    return;
+                }
+            } else {
+                if (taskList?.tasks.find(x => x.id === taskId)?.status === newStatus) {
+                    setOpenStatusDropdown(null);
+                    return;
+                }
+            }
 
-            // if (!result.success) {
-            //     toast.error("Failed to update task status: " + result.message);
-            //     return;
-            // }
+            const token = tokenService.getAccessToken();
+            const result = await apiRequest<TaskRelatedResponseDto>(`ToDoItems/${taskId}/${target}`, {
+                method: "PATCH",
+                token: token || undefined,
+                body: { [target]: newStatus, id: taskId }
+            });
 
-            toast.success("Task status updated successfully!");
+            if (!result.success) {
+                toast.error("Failed to update task " + target + ": " + result.message);
+                return;
+            }
+
+            toast.success("Task " + target + " updated successfully!");
             setOpenStatusDropdown(null);
             getTaskList();
         } catch (error) {
-            console.error("Error updating task status:", error);
             toast.error("An error occurred. Please try again.");
         }
     }
@@ -123,29 +124,7 @@ export default function Tasks() {
         setOpenStatusDropdown(openStatusDropdown === taskId ? null : taskId);
     }
 
-    const handleEditPriority = async (taskId: number, newPriority: number): Promise<void> => {
-        try {
-            // const token = tokenService.getAccessToken();
-            // const result = await apiRequest<DeleteResponseDto>(`ToDoLists/${id}/tasks/${taskId}/priority`, {
-            //     method: "PATCH",
-            //     token: token || undefined,
-            //     body: { priority: newPriority }
-            // });
-
-            // if (!result.success) {
-            //     toast.error("Failed to update task priority: " + result.message);
-            //     return;
-            // }
-
-            toast.success("Task priority updated successfully!");
-            getTaskList();
-        } catch (error) {
-            console.error("Error updating task priority:", error);
-            toast.error("An error occurred. Please try again.");
-        }
-    }
-
-    const handleTitleClick = (taskId: number) => {
+    const handleTitleClickAccordion = (taskId: number) => {
         setExpandedTaskIds(prev => {
             const newSet = new Set(prev);
             if (newSet.has(taskId)) {
@@ -162,7 +141,7 @@ export default function Tasks() {
             <div>
                 <ToastWrapper />
                 {showCreateModal && taskList && <CreateTaskModal onClose={() => setShowCreateModal(false)} onSuccess={getTaskList} item={taskList} />}
-
+                {showEditModal && selectedTask && <EditTaskModal item={selectedTask} listId={taskList?.id ?? 0} onClose={() => setShowEditModal(false)} onSuccess={getTaskList} />}
                 <div className="flex justify-center mt-4 sm:mt-6 md:mt-8 mb-4 px-4">
                     <p className="text-base sm:text-lg md:text-xl font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-teal-300 text-center">Task List: {taskList?.title}</p>
                 </div>
@@ -183,10 +162,10 @@ export default function Tasks() {
                                     >
                                         <PriorityDropdown
                                             priority={task.priority}
-                                            onChange={(value) => handleEditPriority(task.id, value)}
+                                            onChange={(value) => handleEditStatusPriority(task.id, value, true)}
                                         />
 
-                                        <span className="flex-1 break-words text-sm sm:text-base cursor-pointer" onClick={() => handleTitleClick(task.id)}>
+                                        <span className="flex-1 break-words text-sm sm:text-base cursor-pointer" onClick={() => handleTitleClickAccordion(task.id)}>
                                             <span className="hidden sm:inline"> </span>
                                             <span className="text-base sm:text-lg md:text-xl font-bold block sm:inline">{task.title}</span>
                                         </span>
@@ -211,7 +190,7 @@ export default function Tasks() {
                                                     onClick={(e) => e.stopPropagation()}>
                                                     <div
                                                         className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors cursor-pointer"
-                                                        onClick={() => handleEditStatus(task.id, 1)}
+                                                        onClick={() => handleEditStatusPriority(task.id, 1, false)}
                                                         role="button"
                                                         tabIndex={0}
                                                     >
@@ -221,7 +200,7 @@ export default function Tasks() {
                                                     </div>
                                                     <div
                                                         className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors cursor-pointer"
-                                                        onClick={() => handleEditStatus(task.id, 2)}
+                                                        onClick={() => handleEditStatusPriority(task.id, 2, false)}
                                                         role="button"
                                                         tabIndex={0}
                                                     >
@@ -231,7 +210,7 @@ export default function Tasks() {
                                                     </div>
                                                     <div
                                                         className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors cursor-pointer"
-                                                        onClick={() => handleEditStatus(task.id, 3)}
+                                                        onClick={() => handleEditStatusPriority(task.id, 3, false)}
                                                         role="button"
                                                         tabIndex={0}
                                                     >
@@ -256,7 +235,7 @@ export default function Tasks() {
                                         <button
                                             className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                             type="button"
-                                            onClick={() => handleTitleClick(task.id)}
+                                            onClick={() => handleTitleClickAccordion(task.id)}
                                             aria-label="Expand task description"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`w-5 h-5 transition-transform duration-300 ${expandedTaskIds.has(task.id) ? 'rotate-180' : ''}`}>
