@@ -1,29 +1,25 @@
 import { Outlet } from 'react-router-dom'
 import './App.css'
 import Navbar from "./components/Navbar"
-
-// function App() {
-//   return (
-//     <>
-//       <Navbar />
-//       <div className="min-h-screen bg-slate-950 text-slate-50 pt-24">
-//         <div className="mx-auto max-w-5xl px-4 py-10">
-//           <Outlet />
-//         </div>
-//       </div>
-//     </>
-//   )
-// }
-
-// export default App
-
-
-// import { Outlet } from "react-router-dom"
-// import Navbar from "./components/Navbar"
+// import { Toaster } from "react-hot-toast"
 
 export default function App() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      {/* <Toaster
+        position="top-center"
+        containerStyle={{
+          top: 100, // Below navbar
+        }}
+        toastOptions={{
+          duration: 5000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+            fontSize: '16px',
+          },
+        }}
+      /> */}
       <Navbar />
       <main className="pt-20 p-6">
         <Outlet />

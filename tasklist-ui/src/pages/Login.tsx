@@ -2,6 +2,7 @@ import { useState } from "react"
 import { apiRequest } from "../services/apiService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"
+import toast, { Toaster as ToasterComponent } from "react-hot-toast"
 
 interface LoginFormData {
     email: string
@@ -24,22 +25,47 @@ export default function Login() {
         e.preventDefault()
         console.log("Form submitted:", formData)
         try {
-                const result = await apiRequest<LoginResponse>("AuthInitiate/login", { method: "POST", body: { email: formData.email, password: formData.password } });
+                const result = await apiRequest<LoginResponse>("AuthInitiate/login", { 
+                    method: "POST",
+                    body: { email: formData.email, password: formData.password },      
+                    skipErrorHandling: true
+                 });
+
                 console.log("Login response:", result)   
                   
                 if (result.isAuthorised) {
                     setFormData({ email: "", password: "" });   
-                    login(result.token, result.refreshToken)
+                    login(result.token, result.refreshToken);
+                    toast.success("Login successful!"); // ← Changed from toast.error
                     navigate("/dashboard");
                 }
-            } catch (error) {
+                else{
+                    console.log("Login failed - showing error toast");
+                    toast.error("Invalid email or password.");
+                }
+            } catch (error: any) {
                 console.error("Login error:", error);
+                toast.error("An error occurred. Please try again.");
             }   
-    }
+        }
 
 
     return (
         <main className="flex min-h-[60vh] items-center justify-center">
+
+            <ToasterComponent 
+                position="top-center"
+                containerStyle={{
+                    top: 100, // Brings it below the navbar
+                }}
+                toastOptions={{
+                    style: {
+                        background: '#363636',
+                        color: '#fff',
+                    },
+                }}
+           />
+
             <div className="rounded-xl border border-blue-800 bg-blue-900/70 px-6 py-10 text-center shadow-2xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-300 mb-6">Login</p>
                 <div className="space-y-4">
