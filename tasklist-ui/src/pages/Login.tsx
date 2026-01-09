@@ -2,7 +2,8 @@ import { useState } from "react"
 import { apiRequest } from "../services/apiService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"
-import toast, { Toaster as ToasterComponent } from "react-hot-toast"
+import toast from "react-hot-toast"
+import ToastWrapper from "../components/toastWrapper";
 
 interface LoginFormData {
     email: string
@@ -51,21 +52,8 @@ export default function Login() {
 
 
     return (
-        <main className="flex min-h-[60vh] items-center justify-center">
-
-            <ToasterComponent 
-                position="top-center"
-                containerStyle={{
-                    top: 100, // Brings it below the navbar
-                }}
-                toastOptions={{
-                    style: {
-                        background: '#363636',
-                        color: '#fff',
-                    },
-                }}
-           />
-
+        <main className="flex min-h-[60vh] items-center justify-center">           
+           <ToastWrapper />
             <div className="rounded-xl border border-blue-800 bg-blue-900/70 px-6 py-10 text-center shadow-2xl">
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-300 mb-6">Login</p>
                 <div className="space-y-4">
