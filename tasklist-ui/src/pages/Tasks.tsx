@@ -9,6 +9,8 @@ import { tokenService } from '../services/tokenServices';
 import { apiRequest } from "../services/apiService";
 import type { DeleteResponseDto } from '../models/ResponseDtos/DeleteResponseDto';
 import { useNavigate } from 'react-router-dom';
+import { getPriorityInfo } from '../utils/priorityHelper';
+import { getStatusInfo } from '../utils/statusHelper';
 
 interface ResponseDto {
     responseData: TaskList;
@@ -95,7 +97,7 @@ export default function Tasks() {
 
     return (
         <>
-            <div>   
+            <div>
                 <ToastWrapper />
                 {/* {showCreateModal && <CreateTaskModal onClose={() => setShowCreateModal(false)} onSuccess={getTaskList} />}
                 {showDeleteModal && selectedTask && <DeleteTaskConfirmationModal item={selectedTask} onClose={() => setShowDeleteModal(false)} onSuccess={getTaskList} />}
@@ -119,15 +121,34 @@ export default function Tasks() {
                                         role="button"
                                         className="text-slate-800 flex w-full items-center rounded-md p-2 sm:p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 gap-2"
                                     >
-                                        <span className="flex-1 break-words text-sm sm:text-base cursor-pointer" onClick={() => handleNavigation(task.id)}>
-                                            <span className="text-base sm:text-lg md:text-xl font-bold block sm:inline">{task.title}</span>
-                                            <span className="hidden sm:inline">: </span>
-                                            <span className="hidden sm:inline"> : </span>
-                                            <span className="block sm:inline text-xs sm:text-sm text-slate-600 mt-1 sm:mt-0">Priority - {task.priority}</span>
-                                            <span className="block sm:inline text-xs sm:text-sm text-slate-600 mt-1 sm:mt-0">Status - {task.status}</span>
-                                        </span>
-                                        
+                                        <button
+                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                            type="button"
+                                            onClick={() => handleEdit(task.id)}
+                                            aria-label="Edit task priority"                                        >
+                                            <span className="block sm:inline mt-1 sm:mt-0">
+                                                <span className={`inline-flex items-center px-2 py-1 rounded-md text-sm font-medium ${getPriorityInfo(task.priority).color} ${getPriorityInfo(task.priority).bgColor}`}>
+                                                    {getPriorityInfo(task.priority).text}
+                                                </span>
+                                            </span>
+                                        </button>
 
+                                        <span className="flex-1 break-words text-sm sm:text-base cursor-pointer" onClick={() => handleNavigation(task.id)}>
+                                            <span className="hidden sm:inline"> </span>
+                                            <span className="text-base sm:text-lg md:text-xl font-bold block sm:inline">{task.title}</span>
+                                        </span>
+
+                                        <button
+                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                            type="button"
+                                            onClick={() => handleEdit(task.id)}
+                                            aria-label="Edit task status"                                        >
+                                            <span className="block sm:inline mt-1 sm:mt-0">
+                                                <span className={`inline-flex items-center px-2 py-1 rounded-md text-sm font-medium ${getStatusInfo(task.status).color} ${getStatusInfo(task.status).bgColor}`}>
+                                                    {getStatusInfo(task.status).text}
+                                                </span>
+                                            </span>
+                                        </button>
 
                                         <button
                                             className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
@@ -139,8 +160,8 @@ export default function Tasks() {
                                                 <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                                                 <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
                                             </svg>
-                                            </button>
-                                            <button
+                                        </button>
+                                        <button
                                             className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                             type="button"
                                             onClick={() => handleDelete(task.id)}
