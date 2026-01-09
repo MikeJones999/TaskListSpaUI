@@ -1,12 +1,12 @@
 import type { DeleteResponseDto } from '../../models/ResponseDtos/DeleteResponseDto';
-import type { DeleteModalConfrimationProps } from "../../models/DeleteModalConfrimationProps";
+import type { EditDeleteModalConfrimationProps } from "../../models/EditDeleteModalConfrimationProps";
 import { useEffect } from 'react';
 import { apiRequest } from '../../services/apiService';
 import { tokenService } from '../../services/tokenServices';
 import toast from 'react-hot-toast';
 
 
-export default function DeleteTaskListConfirmationModal({ onClose, onSuccess: onSuccessRefreshLists, item }: DeleteModalConfrimationProps) {
+export default function DeleteTaskListConfirmationModal({ onClose, onSuccess: onSuccessRefreshLists, item }: EditDeleteModalConfrimationProps) {
 
     useEffect(() => {
     }, [onClose]);
@@ -28,7 +28,7 @@ export default function DeleteTaskListConfirmationModal({ onClose, onSuccess: on
             }
             
             toast.success("Task list deleted successfully!");
-            await onSuccessRefreshLists();
+            onSuccessRefreshLists();
             onClose();
         } catch (error) {
             console.error("Error deleting task list:", error);
@@ -45,10 +45,16 @@ export default function DeleteTaskListConfirmationModal({ onClose, onSuccess: on
              <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
                 <div className="rounded-xl border border-slate-800 bg-slate-900/70 px-6 py-10 text-center shadow-2xl">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-300">Delete Task List</p>
-                    <h1 className="mt-3 text-4xl font-bold text-slate-50">Please confirm want to delete: {item.title}</h1>
-                    <button onClick={handleDeletion} className="mt-6 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Delete</button>
+                    <h1 className="mt-3 text-4xl font-bold text-slate-50">Please confirm want to delete:</h1>
+                    <h5 className="mt-3 text-2xl font-bold text-slate-50"> {item.title}</h5>
+                    <div className="flex gap-4 justify-center mt-6">
+                        <button onClick={handleDeletion} className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Delete</button>
+                        <button onClick={onClose} className="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">Cancel</button>
+                    </div>
                     <p className="mt-3 text-slate-300">*Note: This cannot be un-done</p>
                 </div>
+                    <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">                                   
+                    </div>
             </div>
         </>
     )
