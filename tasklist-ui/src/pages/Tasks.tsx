@@ -69,7 +69,7 @@ export default function Tasks() {
     }
 
     const handleEdit = async (id: number) => {
-        const taskFound = taskList?.tasks.find(tl => tl.id === id);       
+        const taskFound = taskList?.tasks.find(tl => tl.id === id);
         setSelectedTask(taskFound || null);
         setShowEditModal(true);
     }
@@ -140,11 +140,22 @@ export default function Tasks() {
                 </div>
                 <div className="flex justify-center items-start min-h-screen px-4 sm:px-6 lg:px-8">
                     <div className="w-full max-w-3xl">
-                        <button
-                            onClick={handleCreateTaskModal}
-                            className="mb-4 w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-md shadow transition-all uppercase tracking-wide text-xs sm:text-sm">
-                            Create Task
-                        </button>
+                        <div className="flex items-center gap-2 mb-4">
+                            <button
+                                onClick={() => navigate('/TaskLists')}
+                                className="p-2 text-slate-400 hover:bg-slate-200 rounded-md transition-all flex-shrink-0"
+                                aria-label="Back to task lists"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 sm:w-7 sm:h-7">
+                                    <path fillRule="evenodd" d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 11.25h11.19a.75.75 0 0 1 0 1.5H9.31l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z" clipRule="evenodd" />
+                                </svg>
+                            </button>
+                            <button
+                                onClick={handleCreateTaskModal}
+                                className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-md shadow transition-all uppercase tracking-wide text-xs sm:text-sm">
+                                Create Task
+                            </button>
+                        </div>
                         {taskList?.tasks && taskList.tasks.length > 0 && taskList.tasks.map(task => (
                             <div key={task.id} className="relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 w-full mb-3">
 
