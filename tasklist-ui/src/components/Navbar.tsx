@@ -9,25 +9,28 @@ export default function Navbar() {
   return (
     <nav className="fixed inset-x-0 top-0 z-50 bg-gradient-to-r from-blue-300 via-blue-500 to-blue-700">
       <div className="mx-auto max-w-screen-2xl h-20 flex items-center justify-between px-4 md:px-8">
-        {/* Logo/Brand */}
+       
         <Link to="/" className="text-white font-bold text-xl md:text-2xl">
           Task Manager
         </Link>
 
-        {/* Desktop Navigation - hidden on mobile */}
+        {/* Desktop Navigation - hidden on mobile  ** Asked AI to help with responsiveness */}
         <div className="hidden md:flex items-center gap-8 lg:gap-10">
           <Link to="/" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
             Home
           </Link>
+             {isLoggedIn && (
+              <>
           <Link to="/dashboard" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
             Dashboard
           </Link>
           <Link to="/tasklists" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
             Tasklists
           </Link>   
+          </>)}
         </div>
 
-        {/* Desktop Auth Links - hidden on mobile */}
+        {/* Desktop Auth Links - hidden on mobile * * Asked AI to help with responsiveness */}
         <div className="hidden md:flex items-center gap-6">
           {!isLoggedIn && (
             <>
@@ -51,7 +54,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Hamburger Button */}
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition"
@@ -67,7 +69,6 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
         <div className="md:hidden bg-blue-600 border-t border-blue-400">
           <div className="px-4 py-4 space-y-3">
@@ -93,11 +94,11 @@ export default function Navbar() {
               Tasklists
             </Link>
             <Link
-              to="/profile"
+              to="/userprofile"
               onClick={() => setIsMenuOpen(false)}
               className="block text-white font-semibold text-lg py-2 hover:bg-white/10 rounded px-3 transition"
             >
-              Profile
+              User Profile
             </Link>
             <div className="border-t border-blue-400 pt-3 mt-3 space-y-3">
               <Link

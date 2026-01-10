@@ -2,38 +2,54 @@ import { useParams, useNavigate } from 'react-router-dom';
 import toast from "react-hot-toast"
 import ToastWrapper from "../components/toastWrapper";
 import { useEffect, useState } from 'react';
-import type { TaskList } from "../models/Tasklist";
 import type { Task } from "../models/Task";
 import { tokenService } from '../services/tokenServices';
 import { apiRequest } from "../services/apiService";
 import type { DeleteResponseDto } from '../models/ResponseDtos/DeleteResponseDto';
 import { getStatusInfo } from '../utils/statusHelper';
 import PriorityDropdown from '../components/PriorityDropdown';
-import EditIconButton from '../components/modals/EditIconButton';
+import EditIconButton from '../components/EditIconButton';
+import DeleteIconButton from '../components/DeleteIconButton';
 import CreateTaskModal from '../components/modals/CreateTaskModal';
 import EditTaskModal from '../components/modals/EditTaskModal';
 import type { TaskRelatedResponseDto } from '../models/ResponseDtos/TaskRelatedResponseDto';
 import type { ResponseDto } from '../models/ResponseDtos/ResponseDto';
+import type { PaginatedToDoListResponse } from '../models/ResponseDtos/PaginatedTaskListResponse';
 
 export default function Tasks() {
 
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [taskList, setTaskList] = useState<TaskList | null>(null);
+    const [taskList, setTaskList] = useState<PaginatedToDoListResponse | null>(null);
     const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [openStatusDropdown, setOpenStatusDropdown] = useState<number | null>(null);
     const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(new Set());
+    const [currentSort, setCurrentSort] = useState<string>("");
+    const [currentSortDirection, setCurrentSortDirection] = useState<boolean>(true);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPageCount, setTotalPageCount] = useState<number>(1);
 
-    const getTaskList = async () => {
+    const getTaskList = async (sortBy: string = "", sortDirection: boolean = true, pageNumber: number = 1) => {
         try {
             const token = tokenService.getAccessToken();
-            const data = await apiRequest<ResponseDto<TaskList>>(`ToDoLists/${id}`, { method: "GET", token: token || undefined });
+            const params = new URLSearchParams();
+
+            if (sortBy) {
+                params.append("sortBy", sortBy);
+                params.append("ascending", sortDirection.toString());
+                console.log("Sorting by:", sortBy, "ascending:", sortDirection);
+            }
+            params.append("pageNumber", pageNumber.toString());
+
+            const queryString = params.toString() ? `?${params.toString()}` : "";
+            const data = await apiRequest<ResponseDto<PaginatedToDoListResponse>>(`ToDoLists/${id}/paginated${queryString}`, { method: "GET", token: token || undefined });
+
             if (data.success && data.responseData) {
                 setTaskList(data.responseData);
-                console.log("Fetched task list:", data.responseData);
+                setTotalPageCount(data.responseData.totalPages);
             }
         } catch (error) {
             console.error("Error fetching task list:", error);
@@ -42,8 +58,8 @@ export default function Tasks() {
     };
 
     useEffect(() => {
-        getTaskList();
-    }, []);
+        getTaskList(currentSort, currentSortDirection, currentPage);
+    }, [currentSort, currentSortDirection, currentPage]);
 
     const handleDelete = async (id: number) => {
         try {
@@ -56,7 +72,7 @@ export default function Tasks() {
                 return;
             }
             toast.success("Task deleted successfully!");
-            getTaskList();
+            getTaskList(currentSort, currentSortDirection, currentPage);
         }
         catch (error) {
             toast.error("An error occurred. Please try again.");
@@ -103,7 +119,7 @@ export default function Tasks() {
 
             toast.success("Task " + target + " updated successfully!");
             setOpenStatusDropdown(null);
-            getTaskList();
+            getTaskList(currentSort, currentSortDirection, currentPage);
         } catch (error) {
             toast.error("An error occurred. Please try again.");
         }
@@ -125,12 +141,26 @@ export default function Tasks() {
         });
     }
 
+    const handleSortClick = (sortField: string) => {
+        if (currentSort === sortField) {
+            setCurrentSortDirection(!currentSortDirection);
+        } else {
+            setCurrentSort(sortField);
+            setCurrentSortDirection(true);
+        }
+    };
+
+    const handleClearSort = () => {
+        setCurrentSort("");
+        setCurrentSortDirection(true);
+    };
+
     return (
         <>
             <div>
                 <ToastWrapper />
-                {showCreateModal && taskList && <CreateTaskModal onClose={() => setShowCreateModal(false)} onSuccess={getTaskList} item={taskList} />}
-                {showEditModal && selectedTask && <EditTaskModal item={selectedTask} listId={taskList?.id ?? 0} onClose={() => setShowEditModal(false)} onSuccess={getTaskList} />}
+                {showCreateModal && taskList && <CreateTaskModal onClose={() => setShowCreateModal(false)} onSuccess={() => getTaskList(currentSort, currentSortDirection, currentPage)} item={taskList} />}
+                {showEditModal && selectedTask && <EditTaskModal item={selectedTask} listId={taskList?.id ?? 0} onClose={() => setShowEditModal(false)} onSuccess={() => getTaskList(currentSort, currentSortDirection, currentPage)} />}
                 <div className="flex justify-center mt-4 sm:mt-6 md:mt-8 mb-4 px-4">
                     <p className="text-base sm:text-lg md:text-xl font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-teal-300 text-center">Task List: {taskList?.title}</p>
                 </div>
@@ -151,6 +181,47 @@ export default function Tasks() {
                                 className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-md shadow transition-all uppercase tracking-wide text-xs sm:text-sm">
                                 Create Task
                             </button>
+                            <div className="flex-1"></div>
+                            <span className="text-sm text-slate-600 font-medium">Sort by:</span>
+                            <button
+                                onClick={() => handleSortClick("status")}
+                                className={`font-semibold text-sm transition-all cursor-pointer flex items-center gap-1 ${
+                                    currentSort === "status" 
+                                        ? "text-teal-500 border-b-2 border-teal-500" 
+                                        : "text-slate-600 hover:text-teal-500"
+                                }`}
+                            >
+                                Status
+                                {currentSort === "status" && (
+                                    <span className="text-xs">
+                                        {currentSortDirection ? "↑" : "↓"}
+                                    </span>
+                                )}
+                            </button>
+                            <button
+                                onClick={() => handleSortClick("priority")}
+                                className={`font-semibold text-sm transition-all cursor-pointer flex items-center gap-1 ${
+                                    currentSort === "priority" 
+                                        ? "text-teal-500 border-b-2 border-teal-500" 
+                                        : "text-slate-600 hover:text-teal-500"
+                                }`}
+                            >
+                                Priority
+                                {currentSort === "priority" && (
+                                    <span className="text-xs">
+                                        {currentSortDirection ? "↑" : "↓"}
+                                    </span>
+                                )}
+                            </button>
+                            {currentSort && (
+                              <button
+                                onClick={handleClearSort}
+                                className="text-slate-400 hover:text-red-500 font-semibold text-sm transition-all cursor-pointer ml-1"
+                                title="Clear sort"
+                            >
+                                ✕
+                            </button>
+                            )}
                         </div>
                         {taskList?.tasks && taskList.tasks.length > 0 && taskList.tasks.map(task => (
                             <div key={task.id} className="relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 w-full mb-3">
@@ -158,17 +229,20 @@ export default function Tasks() {
                                 <nav className="flex w-full flex-col gap-1 p-2 sm:p-3">
                                     <div
                                         role="button"
-                                        className="text-slate-800 flex w-full items-center rounded-md p-2 sm:p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 gap-2"
+                                        className="text-slate-800 flex w-full flex-col sm:flex-row sm:items-center rounded-md p-2 sm:p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 gap-2"
                                     >
-                                        <PriorityDropdown
-                                            priority={task.priority}
-                                            onChange={(value) => handleEditStatusPriority(task.id, value, true)}
-                                        />
+                                        <div className="flex items-center gap-2 w-full">
+                                            <PriorityDropdown
+                                                priority={task.priority}
+                                                onChange={(value) => handleEditStatusPriority(task.id, value, true)}
+                                            />
 
-                                        <span className="flex-1 break-words text-sm sm:text-base cursor-pointer" onClick={() => handleTitleClickAccordion(task.id)}>
-                                            <span className="hidden sm:inline"> </span>
-                                            <span className="text-base sm:text-lg md:text-xl font-bold block sm:inline">{task.title}</span>
-                                        </span>
+                                            <span className="flex-1 break-words text-sm sm:text-base cursor-pointer min-w-0" onClick={() => handleTitleClickAccordion(task.id)}>
+                                                <span className="text-base sm:text-lg md:text-xl font-bold">{task.title}</span>
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-1 sm:gap-2 justify-end flex-shrink-0">
 
                                         <button
                                             className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none relative"
@@ -222,16 +296,7 @@ export default function Tasks() {
                                             )}
                                         </button>
                                         <EditIconButton id={task.id} label="Edit task" onClick={handleEdit} />
-                                        <button
-                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                            type="button"
-                                            onClick={() => handleDelete(task.id)}
-                                            aria-label="Delete task list"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
-                                                <path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clipRule="evenodd" />
-                                            </svg>
-                                        </button>
+                                        <DeleteIconButton id={task.id} label="Delete task" onClick={handleDelete} />
                                         <button
                                             className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                             type="button"
@@ -242,6 +307,7 @@ export default function Tasks() {
                                                 <path fillRule="evenodd" d="M12.53 16.97a.75.75 0 0 1-1.06 0l-7.5-7.5a.75.75 0 1 1 1.06-1.06L12 14.94l6.97-6.97a.75.75 0 1 1 1.06 1.06l-7.5 7.5Z" clipRule="evenodd" />
                                             </svg>
                                         </button>
+                                        </div>
                                     </div>
                                 </nav>
 
@@ -260,6 +326,24 @@ export default function Tasks() {
                             </div>
                         ))}
 
+                    </div>
+
+                    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white border border-slate-200 rounded-md shadow-lg px-4 py-2 flex items-center gap-4">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}   
+                            disabled={currentPage === 1}
+                            className="px-3 py-1 bg-teal-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-teal-600 transition-all"
+                        >
+                            Previous
+                        </button>
+                        <span className="text-sm text-slate-700">Page {currentPage} of {totalPageCount}</span>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPageCount))}   
+                            disabled={currentPage === totalPageCount}
+                            className="px-3 py-1 bg-teal-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-teal-600 transition-all"
+                        >
+                            Next
+                        </button>
                     </div>
                 </div>
             </div>
