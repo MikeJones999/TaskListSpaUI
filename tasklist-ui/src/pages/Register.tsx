@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { apiRequest } from "../services/apiService";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"
 import toast from "react-hot-toast"
 import ToastWrapper from "../components/toastWrapper";
 
