@@ -35,20 +35,20 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-6">
           {!isLoggedIn && (
             <>
-              <Link to="/login" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+              <Link to="/login" className="text-teal-300 font-semibold text-base lg:text-lg hover:text-teal-100 transition">
                 Login
               </Link>
-              <Link to="/register" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+              <Link to="/register" className="text-teal-300 font-semibold text-base lg:text-lg hover:text-teal-100 transition">
                 Register
               </Link>
             </>
           )}
           {isLoggedIn && (
             <>
-              <Link to="/userprofile" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+              <Link to="/userprofile" className="text-teal-300 font-semibold text-base lg:text-lg hover:text-teal-100 transition">
                 User Profile
               </Link>
-               <Link to="/logout" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+               <Link to="/logout" className="text-rose-400 font-semibold text-base lg:text-lg hover:text-rose-300 transition">
                 Logout
               </Link>
             </>
@@ -98,7 +98,7 @@ export default function Navbar() {
             <Link
               to="/userprofile"
               onClick={() => setIsMenuOpen(false)}
-              className="block text-white font-semibold text-lg py-2 hover:bg-white/10 rounded px-3 transition"
+              className="block text-teal-300 font-semibold text-lg py-2 hover:bg-teal-600/20 rounded px-3 transition"
             >
               User Profile
             </Link>
@@ -106,20 +106,20 @@ export default function Navbar() {
               <Link
                 to="/login"
                 onClick={() => setIsMenuOpen(false)}
-                className="block text-white font-semibold text-lg py-2 hover:bg-white/10 rounded px-3 transition"
+                className="block text-teal-300 font-semibold text-lg py-2 hover:bg-teal-600/20 rounded px-3 transition"
               >
                 Login
               </Link>
               <Link
                 to="/register"
                 onClick={() => setIsMenuOpen(false)}
-                className="block text-white font-semibold text-lg py-2 hover:bg-white/10 rounded px-3 transition"
+                className="block text-teal-300 font-semibold text-lg py-2 hover:bg-teal-600/20 rounded px-3 transition"
               >
                 Register
               </Link>
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="block w-full text-left text-white font-semibold text-lg py-2 hover:bg-white/10 rounded px-3 transition"
+                className="block w-full text-left text-rose-400 font-semibold text-lg py-2 hover:bg-rose-400/20 rounded px-3 transition"
               >
                 Logout
               </button>
