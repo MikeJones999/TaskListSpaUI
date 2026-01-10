@@ -9,18 +9,20 @@ import { apiRequest } from "../services/apiService";
 import type { DeleteResponseDto } from '../models/ResponseDtos/DeleteResponseDto';
 import { getStatusInfo } from '../utils/statusHelper';
 import PriorityDropdown from '../components/PriorityDropdown';
-import EditIconButton from '../components/modals/EditIconButton';
+import EditIconButton from '../components/EditIconButton';
+import DeleteIconButton from '../components/DeleteIconButton';
 import CreateTaskModal from '../components/modals/CreateTaskModal';
 import EditTaskModal from '../components/modals/EditTaskModal';
 import type { TaskRelatedResponseDto } from '../models/ResponseDtos/TaskRelatedResponseDto';
 import type { ResponseDto } from '../models/ResponseDtos/ResponseDto';
+import type { PaginatedToDoListResponse } from '../models/ResponseDtos/PaginatedTaskListResponse';
 
 export default function Tasks() {
 
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [taskList, setTaskList] = useState<TaskList | null>(null);
+    const [taskList, setTaskList] = useState<PaginatedToDoListResponse | null>(null);
     const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -30,10 +32,12 @@ export default function Tasks() {
     const getTaskList = async () => {
         try {
             const token = tokenService.getAccessToken();
-            const data = await apiRequest<ResponseDto<TaskList>>(`ToDoLists/${id}`, { method: "GET", token: token || undefined });
+            //const data = await apiRequest<ResponseDto<TaskList>>(`ToDoLists/${id}`, { method: "GET", token: token || undefined });
+            const data = await apiRequest<ResponseDto<PaginatedToDoListResponse>>(`ToDoLists/${id}/paginated`, { method: "GET", token: token || undefined });
+
+
             if (data.success && data.responseData) {
                 setTaskList(data.responseData);
-                console.log("Fetched task list:", data.responseData);
             }
         } catch (error) {
             console.error("Error fetching task list:", error);
@@ -158,17 +162,20 @@ export default function Tasks() {
                                 <nav className="flex w-full flex-col gap-1 p-2 sm:p-3">
                                     <div
                                         role="button"
-                                        className="text-slate-800 flex w-full items-center rounded-md p-2 sm:p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 gap-2"
+                                        className="text-slate-800 flex w-full flex-col sm:flex-row sm:items-center rounded-md p-2 sm:p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 gap-2"
                                     >
-                                        <PriorityDropdown
-                                            priority={task.priority}
-                                            onChange={(value) => handleEditStatusPriority(task.id, value, true)}
-                                        />
+                                        <div className="flex items-center gap-2 w-full">
+                                            <PriorityDropdown
+                                                priority={task.priority}
+                                                onChange={(value) => handleEditStatusPriority(task.id, value, true)}
+                                            />
 
-                                        <span className="flex-1 break-words text-sm sm:text-base cursor-pointer" onClick={() => handleTitleClickAccordion(task.id)}>
-                                            <span className="hidden sm:inline"> </span>
-                                            <span className="text-base sm:text-lg md:text-xl font-bold block sm:inline">{task.title}</span>
-                                        </span>
+                                            <span className="flex-1 break-words text-sm sm:text-base cursor-pointer min-w-0" onClick={() => handleTitleClickAccordion(task.id)}>
+                                                <span className="text-base sm:text-lg md:text-xl font-bold">{task.title}</span>
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-1 sm:gap-2 justify-end flex-shrink-0">
 
                                         <button
                                             className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none relative"
@@ -222,16 +229,7 @@ export default function Tasks() {
                                             )}
                                         </button>
                                         <EditIconButton id={task.id} label="Edit task" onClick={handleEdit} />
-                                        <button
-                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                            type="button"
-                                            onClick={() => handleDelete(task.id)}
-                                            aria-label="Delete task list"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
-                                                <path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clipRule="evenodd" />
-                                            </svg>
-                                        </button>
+                                        <DeleteIconButton id={task.id} label="Delete task" onClick={handleDelete} />
                                         <button
                                             className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                             type="button"
@@ -242,6 +240,7 @@ export default function Tasks() {
                                                 <path fillRule="evenodd" d="M12.53 16.97a.75.75 0 0 1-1.06 0l-7.5-7.5a.75.75 0 1 1 1.06-1.06L12 14.94l6.97-6.97a.75.75 0 1 1 1.06 1.06l-7.5 7.5Z" clipRule="evenodd" />
                                             </svg>
                                         </button>
+                                        </div>
                                     </div>
                                 </nav>
 
