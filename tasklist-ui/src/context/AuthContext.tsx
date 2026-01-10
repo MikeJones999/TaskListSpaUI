@@ -1,3 +1,9 @@
+/**
+ * Asked AI to create this function - Not my work!!!!!!! 
+ * Having issue wit the refresh of the nav bar upon login in and out
+ */
+
+
 import { createContext, useContext, useState, useEffect } from "react";
 import { tokenService } from "../services/tokenServices";
 

@@ -1,45 +1,45 @@
-import { useEffect, useState } from "react";
-import type { UserProfileResponseDto } from "../models/ResponseDtos/UserProfileResponseDto";
+import { useRef, useState } from "react";
 import { apiRequest } from "../services/apiService";
 import { tokenService } from "../services/tokenServices";
-import type UserProfileModel from "../models/UserProfileModel";
+import { validateAndResizeImage } from "../utils/imageResizer";
+import { useUserProfile } from "../hooks/useUserProfile";
+import type { ResponseDto } from "../models/ResponseDtos/ResponseDto";
+import type { FileUploadModel } from "../models/FileUploadModel";
+import ToastWrapper from "../components/toastWrapper";
+import toast from "react-hot-toast";
 
 
 export default function UserProfilePage() {
 
-  const [userData, setUserData] = useState<UserProfileModel | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const token = tokenService.getAccessToken();
 
- const getUserProfile = async() => {
-    try{
-        const token = tokenService.getAccessToken();        
-        const result = await apiRequest<UserProfileResponseDto>(`UserProfile/Profile`, { method: "GET", token: token || undefined });
-        if(result.success && result.responseData){
-            console.log("User profile data:", result.responseData);
-            setUserData(result.responseData);
-        }
+  const { userData, profileImageUrl, refetch } = useUserProfile(token);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      setSelectedFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
     }
-    catch(error){
-        console.error("Error fetching user profile:", error);
+    const result = await validateAndResizeImage(file);
+
+    if (result.success && result.file) {
+      setSelectedFile(result.file);
+    } else {
+      toast.error(result.error || "Failed to process image.");
+      setSelectedFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
- }
-
- useEffect(() => {
-    getUserProfile();
- }, 
- []);   
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    setSelectedFile(file);
-    setMessage(null);
   };
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      setMessage("Please select an image first.");
+      toast.error("Please select an image first.");
       return;
     }
     const token = tokenService.getAccessToken();
@@ -48,60 +48,89 @@ export default function UserProfilePage() {
 
     try {
       setUploading(true);
-      setMessage(null);
-      const resp = await fetch(`${import.meta.env.VITE_API_BASE_URL || ""}/UserProfile/UploadImage`, {
+      const response = await apiRequest<ResponseDto<FileUploadModel>>(`UserProfile/image`, {
         method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        token: token || undefined,
         body: formData,
       });
-      if (!resp.ok) throw new Error("Upload failed");
-      setMessage("Image uploaded successfully.");
+      if (!response.success) {
+        toast.error("Upload failed: " + response.message);
+        return;
+      }
+      toast.success("Image uploaded successfully.");
+      console.log("Upload response:", response.responseData);
       setSelectedFile(null);
-      await getUserProfile(); // refresh profile data
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      await refetch();
     } catch (err) {
       console.error(err);
-      setMessage("Upload failed. Please try again.");
+      toast.error("Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <div>
-      Welcome {userData?.displayName}
-      <p>Email: {userData?.email}</p>
+    <>
+      <ToastWrapper />
+      <div className="flex justify-center items-start min-h-screen px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-3xl">
+          <div className="flex justify-center mt-4 sm:mt-6 md:mt-8 mb-8 px-4">
+            <p className="text-base sm:text-lg md:text-xl font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-teal-300 text-center">Welcome {userData?.displayName}</p>
+          </div>
 
-      <div className="mt-3 space-y-2">
-        {!userData?.hasProfileImage && (
-          <p>No profile image set. Would you like to upload one?</p>
-        )}
+          <div className="flex justify-center mb-6">
+            {profileImageUrl && (
+              <img
+                src={profileImageUrl}
+                alt="Profile"
+                className="h-40 w-40 rounded-full object-cover border-4 border-teal-300 shadow-lg"
+              />
+            )}
+          </div>
 
-        <div className="flex flex-col gap-2">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            aria-label="Select profile image"
-            className="block w-full text-sm text-slate-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded file:border-0
-              file:text-sm file:font-semibold
-              file:bg-teal-50 file:text-teal-700
-              hover:file:bg-teal-100"
-          />
-          {selectedFile && (
-            <p className="text-sm text-slate-600">Selected: {selectedFile.name}</p>
-          )}
-          <button
-            onClick={handleUpload}
-            disabled={!selectedFile || uploading}
-            className="px-3 py-1.5 rounded bg-teal-500 text-white disabled:opacity-60 disabled:cursor-not-allowed hover:bg-teal-600 transition-colors"
-          >
-            {uploading ? "Uploading..." : "Upload Image"}
-          </button>
+          <div className="text-center mb-8">
+            <p className="text-base sm:text-lg text-slate-400">Email: {userData?.email}</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6">
+            {!userData?.hasProfileImage && (
+              <p className="text-slate-700 mb-4">No profile image set. Would you like to upload one?</p>
+            )}
+            {userData?.hasProfileImage && (
+              <p className="text-slate-700 mb-4 font-semibold">Change your profile image:</p>
+            )}
+
+            <div className="flex flex-col gap-3">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                ref={fileInputRef}
+                aria-label="Select profile image"
+                className="block w-full text-sm text-slate-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded file:border-0
+                file:text-sm file:font-semibold
+                file:bg-teal-50 file:text-teal-700
+                hover:file:bg-teal-100 cursor-pointer"
+              />
+              {selectedFile && (
+                <p className="text-xs sm:text-sm text-teal-600 font-medium">Selected: {selectedFile.name}</p>
+              )}
+              <div>
+                <button
+                  onClick={handleUpload}
+                  disabled={!selectedFile || uploading}
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 rounded text-sm font-semibold bg-teal-500 text-white disabled:opacity-60 disabled:cursor-not-allowed hover:bg-teal-600 transition-all shadow"
+                >
+                  {uploading ? "Uploading..." : "Upload Image"}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        {message && <p className="text-sm text-slate-600">{message}</p>}
       </div>
-    </div>
+    </>
   )
 }

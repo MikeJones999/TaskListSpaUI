@@ -10,13 +10,7 @@ import DeleteTaskListConfirmationModal from '../components/modals/DeleteTaskList
 import EditTaskListModal from '../components/modals/EditTaskListModal';
 import { useNavigate } from 'react-router-dom';
 import EditIconButton from '../components/modals/EditIconButton';
-
-
-interface ResponseDto {
-    responseData: TaskList[];
-    success: boolean;
-    message: string;
-}
+import type { ResponseDto } from '../models/ResponseDtos/ResponseDto';
 
 export default function TaskLists() {
 
@@ -30,7 +24,7 @@ export default function TaskLists() {
     const getTaskLists = async () => {
         try {
             const token = tokenService.getAccessToken();
-            const data = await apiRequest<ResponseDto>("ToDoLists", { method: "GET", token: token || undefined });
+            const data = await apiRequest<ResponseDto<TaskList[]>>("ToDoLists", { method: "GET", token: token || undefined });
             if (data.success && data.responseData) {
                 setTaskLists(data.responseData);
             }

@@ -4,10 +4,10 @@ import { apiRequest } from "../services/apiService";
 import type { DashboardData, DashboardResponseDto } from "../models/ResponseDtos/DashboardResponseDto";
 import { getPriorityInfo } from "../utils/priorityHelper";
 import { getStatusInfo } from "../utils/statusHelper";
-
-
+import { useUserProfile } from "../hooks/useUserProfile";
 
 export default function Dashboard() {
+
   const [data, setData] = useState<DashboardData>({
     taskListCount: 0,
     totalTasksCount: 0,
@@ -19,14 +19,13 @@ export default function Dashboard() {
     tasksPriorityHigh: 0,
   });
 
+  const token = tokenService.getAccessToken();
+  const { userData, profileImageUrl } = useUserProfile(token);
+
   const dashboardData = async () => {
     try {
-      const token = tokenService.getAccessToken();
       const res = await apiRequest<DashboardResponseDto>("Dashboard", { method: "GET", token: token || undefined });
-      console.log("Dashboard data response:", res);
       if (res.success && res.responseData) {
-              console.log("dahsboard data broken down:", res.responseData);
-
         setData(res.responseData);
       }
     } catch (error) {
@@ -44,8 +43,21 @@ export default function Dashboard() {
         <p className="text-base sm:text-lg md:text-xl font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-teal-300 text-center">Dashboard</p>
       </div>
 
+      <div className="flex justify-center mb-6">
+        {profileImageUrl && (
+          <img
+            src={profileImageUrl}
+            alt="Profile"
+            className="h-40 w-40 rounded-full object-cover border-4 border-teal-300 shadow-lg"
+          />
+        )}
+      </div>
+      <div className="text-center mb-8">
+        <p className="text-base sm:text-lg text-slate-400">{userData?.displayName}</p>
+      </div>
+
       <div className="px-4 sm:px-6 lg:px-8 space-y-8">
- 
+
         <div>
           <h2 className="text-base sm:text-lg font-bold uppercase tracking-wide text-teal-800 mb-3">Overview</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -79,7 +91,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-   
+
         <div>
           <h2 className="text-base sm:text-lg font-bold uppercase tracking-wide text-teal-800 mb-3">By Priority</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

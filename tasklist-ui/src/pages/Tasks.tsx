@@ -13,12 +13,7 @@ import EditIconButton from '../components/modals/EditIconButton';
 import CreateTaskModal from '../components/modals/CreateTaskModal';
 import EditTaskModal from '../components/modals/EditTaskModal';
 import type { TaskRelatedResponseDto } from '../models/ResponseDtos/TaskRelatedResponseDto';
-
-interface ResponseDto {
-    responseData: TaskList;
-    success: boolean;
-    message: string;
-}
+import type { ResponseDto } from '../models/ResponseDtos/ResponseDto';
 
 export default function Tasks() {
 
@@ -35,7 +30,7 @@ export default function Tasks() {
     const getTaskList = async () => {
         try {
             const token = tokenService.getAccessToken();
-            const data = await apiRequest<ResponseDto>(`ToDoLists/${id}`, { method: "GET", token: token || undefined });
+            const data = await apiRequest<ResponseDto<TaskList>>(`ToDoLists/${id}`, { method: "GET", token: token || undefined });
             if (data.success && data.responseData) {
                 setTaskList(data.responseData);
             }
