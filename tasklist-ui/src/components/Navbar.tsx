@@ -41,7 +41,7 @@ export default function Navbar() {
           )}
           {isLoggedIn && (
             <>
-              <Link to="/profile" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+              <Link to="/userprofile" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
                 User Profile
               </Link>
                <Link to="/logout" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">

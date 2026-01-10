@@ -33,7 +33,12 @@ export default function Register() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        //console.log("Form submitted:", formData)
+
+        if(formData.password !== formData.confirmPassword) {
+            toast.error("Passwords do not match.");
+            return;
+        }
+
         try {
                 const result = await apiRequest<RegisterResponse>("AuthInitiate/register", { 
                     method: "POST",

@@ -6,7 +6,7 @@ import Logout from "../pages/Logout"
 import Register from "../pages/Register"
 import Dashboard from "../pages/Dashboard"
 import TaskLists from "../pages/TaskLists"
-// import UserProfile from "../pages/UserProfile"
+import UserProfile from "../pages/UserProfile"
 import ProtectedRoute from "../components/ProtectedRoute"
 import Tasks from "../pages/Tasks"
 
@@ -24,8 +24,8 @@ export const router = createBrowserRouter([
         { path: "dashboard", element: <Dashboard /> },
         { path: "logout", element: <Logout /> },
         { path: "tasklists", element: <TaskLists /> },
-        { path: "tasks/:id", element: <Tasks /> }
-        
+        { path: "tasks/:id", element: <Tasks /> },
+        { path: "userprofile", element: <UserProfile /> }
          // add more protected routes here later
      ] }
     ]
