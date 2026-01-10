@@ -1,6 +1,6 @@
-# <span style="color: #20B2AA;">Task Manager</span>
+# <span style="color: #20B2AA;">Task Manager UI</span>
 
-![Task Manager Icon](public/TaskManagerIcon.png)
+![Task Manager Icon](tasklist-ui/public/TaskManagerIcon.png)
 
 This is the frontend UI for the Task Manager/list project
 
