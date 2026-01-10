@@ -5,6 +5,7 @@ export interface PaginatedToDoListResponse {
     title: string;
     description: string;
     userId: string;
+    toDoItemCount: number;
     totalItemCount: number;
     pageNumber: number;
     pageSize: number;

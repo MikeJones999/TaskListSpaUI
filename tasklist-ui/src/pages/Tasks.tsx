@@ -2,7 +2,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import toast from "react-hot-toast"
 import ToastWrapper from "../components/toastWrapper";
 import { useEffect, useState } from 'react';
-import type { TaskList } from "../models/Tasklist";
 import type { Task } from "../models/Task";
 import { tokenService } from '../services/tokenServices';
 import { apiRequest } from "../services/apiService";
@@ -28,16 +27,29 @@ export default function Tasks() {
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [openStatusDropdown, setOpenStatusDropdown] = useState<number | null>(null);
     const [expandedTaskIds, setExpandedTaskIds] = useState<Set<number>>(new Set());
+    const [currentSort, setCurrentSort] = useState<string>("");
+    const [currentSortDirection, setCurrentSortDirection] = useState<boolean>(true);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPageCount, setTotalPageCount] = useState<number>(1);
 
-    const getTaskList = async () => {
+    const getTaskList = async (sortBy: string = "", sortDirection: boolean = true, pageNumber: number = 1) => {
         try {
             const token = tokenService.getAccessToken();
-            //const data = await apiRequest<ResponseDto<TaskList>>(`ToDoLists/${id}`, { method: "GET", token: token || undefined });
-            const data = await apiRequest<ResponseDto<PaginatedToDoListResponse>>(`ToDoLists/${id}/paginated`, { method: "GET", token: token || undefined });
+            const params = new URLSearchParams();
 
+            if (sortBy) {
+                params.append("sortBy", sortBy);
+                params.append("ascending", sortDirection.toString());
+                console.log("Sorting by:", sortBy, "ascending:", sortDirection);
+            }
+            params.append("pageNumber", pageNumber.toString());
+
+            const queryString = params.toString() ? `?${params.toString()}` : "";
+            const data = await apiRequest<ResponseDto<PaginatedToDoListResponse>>(`ToDoLists/${id}/paginated${queryString}`, { method: "GET", token: token || undefined });
 
             if (data.success && data.responseData) {
                 setTaskList(data.responseData);
+                setTotalPageCount(data.responseData.totalPages);
             }
         } catch (error) {
             console.error("Error fetching task list:", error);
@@ -46,8 +58,8 @@ export default function Tasks() {
     };
 
     useEffect(() => {
-        getTaskList();
-    }, []);
+        getTaskList(currentSort, currentSortDirection, currentPage);
+    }, [currentSort, currentSortDirection, currentPage]);
 
     const handleDelete = async (id: number) => {
         try {
@@ -60,7 +72,7 @@ export default function Tasks() {
                 return;
             }
             toast.success("Task deleted successfully!");
-            getTaskList();
+            getTaskList(currentSort, currentSortDirection, currentPage);
         }
         catch (error) {
             toast.error("An error occurred. Please try again.");
@@ -107,7 +119,7 @@ export default function Tasks() {
 
             toast.success("Task " + target + " updated successfully!");
             setOpenStatusDropdown(null);
-            getTaskList();
+            getTaskList(currentSort, currentSortDirection, currentPage);
         } catch (error) {
             toast.error("An error occurred. Please try again.");
         }
@@ -129,12 +141,26 @@ export default function Tasks() {
         });
     }
 
+    const handleSortClick = (sortField: string) => {
+        if (currentSort === sortField) {
+            setCurrentSortDirection(!currentSortDirection);
+        } else {
+            setCurrentSort(sortField);
+            setCurrentSortDirection(true);
+        }
+    };
+
+    const handleClearSort = () => {
+        setCurrentSort("");
+        setCurrentSortDirection(true);
+    };
+
     return (
         <>
             <div>
                 <ToastWrapper />
-                {showCreateModal && taskList && <CreateTaskModal onClose={() => setShowCreateModal(false)} onSuccess={getTaskList} item={taskList} />}
-                {showEditModal && selectedTask && <EditTaskModal item={selectedTask} listId={taskList?.id ?? 0} onClose={() => setShowEditModal(false)} onSuccess={getTaskList} />}
+                {showCreateModal && taskList && <CreateTaskModal onClose={() => setShowCreateModal(false)} onSuccess={() => getTaskList(currentSort, currentSortDirection, currentPage)} item={taskList} />}
+                {showEditModal && selectedTask && <EditTaskModal item={selectedTask} listId={taskList?.id ?? 0} onClose={() => setShowEditModal(false)} onSuccess={() => getTaskList(currentSort, currentSortDirection, currentPage)} />}
                 <div className="flex justify-center mt-4 sm:mt-6 md:mt-8 mb-4 px-4">
                     <p className="text-base sm:text-lg md:text-xl font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-teal-300 text-center">Task List: {taskList?.title}</p>
                 </div>
@@ -155,6 +181,47 @@ export default function Tasks() {
                                 className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-md shadow transition-all uppercase tracking-wide text-xs sm:text-sm">
                                 Create Task
                             </button>
+                            <div className="flex-1"></div>
+                            <span className="text-sm text-slate-600 font-medium">Sort by:</span>
+                            <button
+                                onClick={() => handleSortClick("status")}
+                                className={`font-semibold text-sm transition-all cursor-pointer flex items-center gap-1 ${
+                                    currentSort === "status" 
+                                        ? "text-teal-500 border-b-2 border-teal-500" 
+                                        : "text-slate-600 hover:text-teal-500"
+                                }`}
+                            >
+                                Status
+                                {currentSort === "status" && (
+                                    <span className="text-xs">
+                                        {currentSortDirection ? "↑" : "↓"}
+                                    </span>
+                                )}
+                            </button>
+                            <button
+                                onClick={() => handleSortClick("priority")}
+                                className={`font-semibold text-sm transition-all cursor-pointer flex items-center gap-1 ${
+                                    currentSort === "priority" 
+                                        ? "text-teal-500 border-b-2 border-teal-500" 
+                                        : "text-slate-600 hover:text-teal-500"
+                                }`}
+                            >
+                                Priority
+                                {currentSort === "priority" && (
+                                    <span className="text-xs">
+                                        {currentSortDirection ? "↑" : "↓"}
+                                    </span>
+                                )}
+                            </button>
+                            {currentSort && (
+                              <button
+                                onClick={handleClearSort}
+                                className="text-slate-400 hover:text-red-500 font-semibold text-sm transition-all cursor-pointer ml-1"
+                                title="Clear sort"
+                            >
+                                ✕
+                            </button>
+                            )}
                         </div>
                         {taskList?.tasks && taskList.tasks.length > 0 && taskList.tasks.map(task => (
                             <div key={task.id} className="relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 w-full mb-3">
@@ -259,6 +326,24 @@ export default function Tasks() {
                             </div>
                         ))}
 
+                    </div>
+
+                    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white border border-slate-200 rounded-md shadow-lg px-4 py-2 flex items-center gap-4">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}   
+                            disabled={currentPage === 1}
+                            className="px-3 py-1 bg-teal-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-teal-600 transition-all"
+                        >
+                            Previous
+                        </button>
+                        <span className="text-sm text-slate-700">Page {currentPage} of {totalPageCount}</span>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPageCount))}   
+                            disabled={currentPage === totalPageCount}
+                            className="px-3 py-1 bg-teal-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-teal-600 transition-all"
+                        >
+                            Next
+                        </button>
                     </div>
                 </div>
             </div>
