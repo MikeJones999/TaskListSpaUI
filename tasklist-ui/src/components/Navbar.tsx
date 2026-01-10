@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 import { useState } from "react"
 import { useAuth } from "../context/AuthContext";
 
@@ -9,45 +9,46 @@ export default function Navbar() {
   return (
     <nav className="fixed inset-x-0 top-0 z-50 bg-gradient-to-r from-blue-300 via-blue-500 to-blue-700">
       <div className="mx-auto max-w-screen-2xl h-20 flex items-center justify-between px-4 md:px-8">
-       
-        <Link to="/" className="text-white font-bold text-xl md:text-2xl">
-          Task Manager
+
+        <Link to="/" className="flex items-center gap-2">
+          <img src="/TaskManagerIcon.png" alt="Task Manager Icon" className="h-8 w-8 sm:h-9 sm:w-9" />
+          <span className="text-base sm:text-lg md:text-xl font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-teal-300 text-center">
+            Task Manager
+          </span>
         </Link>
 
-        {/* Desktop Navigation - hidden on mobile  ** Asked AI to help with responsiveness */}
         <div className="hidden md:flex items-center gap-8 lg:gap-10">
-          <Link to="/" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+          <NavLink to="/" className={({ isActive }) => `text-white font-semibold text-base lg:text-lg transition ${isActive ? 'border-b-2 border-white' : 'hover:text-blue-100'}`}>
             Home
-          </Link>
+          </NavLink>
              {isLoggedIn && (
               <>
-          <Link to="/dashboard" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+          <NavLink to="/dashboard" className={({ isActive }) => `text-white font-semibold text-base lg:text-lg transition ${isActive ? 'border-b-2 border-white' : 'hover:text-blue-100'}`}>
             Dashboard
-          </Link>
-          <Link to="/tasklists" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
-            Tasklists
-          </Link>   
+          </NavLink>
+          <NavLink to="/tasklists" className={({ isActive }) => `text-white font-semibold text-base lg:text-lg transition ${isActive ? 'border-b-2 border-white' : 'hover:text-blue-100'}`}>
+            Task Lists
+          </NavLink>   
           </>)}
         </div>
 
-        {/* Desktop Auth Links - hidden on mobile * * Asked AI to help with responsiveness */}
         <div className="hidden md:flex items-center gap-6">
           {!isLoggedIn && (
             <>
-              <Link to="/login" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+              <Link to="/login" className="text-teal-300 font-semibold text-base lg:text-lg hover:text-teal-100 transition">
                 Login
               </Link>
-              <Link to="/register" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+              <Link to="/register" className="text-teal-300 font-semibold text-base lg:text-lg hover:text-teal-100 transition">
                 Register
               </Link>
             </>
           )}
           {isLoggedIn && (
             <>
-              <Link to="/userprofile" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+              <Link to="/userprofile" className="text-teal-300 font-semibold text-base lg:text-lg hover:text-teal-100 transition">
                 User Profile
               </Link>
-               <Link to="/logout" className="text-white font-semibold text-base lg:text-lg hover:text-blue-100 transition">
+               <Link to="/logout" className="text-rose-400 font-semibold text-base lg:text-lg hover:text-rose-300 transition">
                 Logout
               </Link>
             </>
@@ -68,7 +69,8 @@ export default function Navbar() {
           </svg>
         </button>
       </div>
-
+      
+      {/* Mobile links - hidden on desktop * * Asked AI to help with responsiveness */}
       {isMenuOpen && (
         <div className="md:hidden bg-blue-600 border-t border-blue-400">
           <div className="px-4 py-4 space-y-3">
@@ -96,7 +98,7 @@ export default function Navbar() {
             <Link
               to="/userprofile"
               onClick={() => setIsMenuOpen(false)}
-              className="block text-white font-semibold text-lg py-2 hover:bg-white/10 rounded px-3 transition"
+              className="block text-teal-300 font-semibold text-lg py-2 hover:bg-teal-600/20 rounded px-3 transition"
             >
               User Profile
             </Link>
@@ -104,20 +106,20 @@ export default function Navbar() {
               <Link
                 to="/login"
                 onClick={() => setIsMenuOpen(false)}
-                className="block text-white font-semibold text-lg py-2 hover:bg-white/10 rounded px-3 transition"
+                className="block text-teal-300 font-semibold text-lg py-2 hover:bg-teal-600/20 rounded px-3 transition"
               >
                 Login
               </Link>
               <Link
                 to="/register"
                 onClick={() => setIsMenuOpen(false)}
-                className="block text-white font-semibold text-lg py-2 hover:bg-white/10 rounded px-3 transition"
+                className="block text-teal-300 font-semibold text-lg py-2 hover:bg-teal-600/20 rounded px-3 transition"
               >
                 Register
               </Link>
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="block w-full text-left text-white font-semibold text-lg py-2 hover:bg-white/10 rounded px-3 transition"
+                className="block w-full text-left text-rose-400 font-semibold text-lg py-2 hover:bg-rose-400/20 rounded px-3 transition"
               >
                 Logout
               </button>
