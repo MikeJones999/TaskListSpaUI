@@ -100,6 +100,7 @@ export default function UserProfilePage() {
             {userData?.hasProfileImage && (
               <p className="text-slate-700 mb-4 font-semibold">Change your profile image:</p>
             )}
+            <p className="text-red-700 mb-4 font-semibold">NOTE: Max size 500 X 600</p>
 
             <div className="flex flex-col gap-3">
               <input

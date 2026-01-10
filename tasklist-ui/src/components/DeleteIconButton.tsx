@@ -1,7 +1,7 @@
 export default function DeleteIconButton({ id, label, onClick }: { id: number; label: string, onClick: (id: number) => void }) {
     return (
         <button
-            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-rose-400 hover:bg-rose-50 focus:bg-rose-50 active:bg-rose-50 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             type="button"
             onClick={() => onClick(id)}
             aria-label={label}

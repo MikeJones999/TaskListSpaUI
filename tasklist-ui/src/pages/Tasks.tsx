@@ -166,6 +166,13 @@ export default function Tasks() {
                 </div>
                 <div className="flex justify-center items-start min-h-screen px-4 sm:px-6 lg:px-8">
                     <div className="w-full max-w-3xl">
+                        <div className="mb-4">
+                            <button
+                                onClick={handleCreateTaskModal}
+                                className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-md shadow transition-all uppercase tracking-wide text-xs sm:text-sm">
+                                Create Task
+                            </button>
+                        </div>
                         <div className="flex items-center gap-2 mb-4">
                             <button
                                 onClick={() => navigate('/TaskLists')}
@@ -176,52 +183,54 @@ export default function Tasks() {
                                     <path fillRule="evenodd" d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 11.25h11.19a.75.75 0 0 1 0 1.5H9.31l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z" clipRule="evenodd" />
                                 </svg>
                             </button>
-                            <button
-                                onClick={handleCreateTaskModal}
-                                className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-md shadow transition-all uppercase tracking-wide text-xs sm:text-sm">
-                                Create Task
-                            </button>
-                            <div className="flex-1"></div>
-                            <span className="text-sm text-slate-600 font-medium">Sort by:</span>
-                            <button
-                                onClick={() => handleSortClick("status")}
-                                className={`font-semibold text-sm transition-all cursor-pointer flex items-center gap-1 ${
-                                    currentSort === "status" 
-                                        ? "text-teal-500 border-b-2 border-teal-500" 
-                                        : "text-slate-600 hover:text-teal-500"
-                                }`}
-                            >
-                                Status
-                                {currentSort === "status" && (
-                                    <span className="text-xs">
-                                        {currentSortDirection ? "↑" : "↓"}
-                                    </span>
+                            <div className="flex-1 flex items-center justify-between relative">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg text-slate-600 font-medium">Sort:</span>
+                                    <button
+                                        onClick={() => handleSortClick("priority")}
+                                        className={`font-semibold text-lg transition-all cursor-pointer flex items-center gap-1 ${
+                                            currentSort === "priority" 
+                                                ? "text-teal-500 border-b-2 border-teal-500" 
+                                                : "text-slate-600 hover:text-teal-500"
+                                        }`}
+                                    >
+                                        Priority
+                                        {currentSort === "priority" && (
+                                            <span className="text-base">
+                                                {currentSortDirection ? "↑" : "↓"}
+                                            </span>
+                                        )}
+                                    </button>
+                                </div>
+                                
+                                <div className="flex items-center gap-2 mr-32">
+                                <span className="text-lg text-slate-600 font-medium">Sort:</span>
+                                    <button
+                                        onClick={() => handleSortClick("status")}
+                                        className={`font-semibold text-lg transition-all cursor-pointer flex items-center gap-1 ${
+                                            currentSort === "status" 
+                                                ? "text-teal-500 border-b-2 border-teal-500" 
+                                                : "text-slate-600 hover:text-teal-500"
+                                        }`}
+                                    >
+                                        Status
+                                        {currentSort === "status" && (
+                                            <span className="text-base">
+                                                {currentSortDirection ? "↑" : "↓"}
+                                            </span>
+                                        )}
+                                    </button>
+                                </div>
+                                {currentSort && (
+                                  <button
+                                    onClick={handleClearSort}
+                                    className="absolute right-0 text-slate-400 hover:text-red-500 font-semibold text-lg transition-all cursor-pointer"
+                                    title="Clear sort"
+                                  >
+                                    ✕
+                                  </button>
                                 )}
-                            </button>
-                            <button
-                                onClick={() => handleSortClick("priority")}
-                                className={`font-semibold text-sm transition-all cursor-pointer flex items-center gap-1 ${
-                                    currentSort === "priority" 
-                                        ? "text-teal-500 border-b-2 border-teal-500" 
-                                        : "text-slate-600 hover:text-teal-500"
-                                }`}
-                            >
-                                Priority
-                                {currentSort === "priority" && (
-                                    <span className="text-xs">
-                                        {currentSortDirection ? "↑" : "↓"}
-                                    </span>
-                                )}
-                            </button>
-                            {currentSort && (
-                              <button
-                                onClick={handleClearSort}
-                                className="text-slate-400 hover:text-red-500 font-semibold text-sm transition-all cursor-pointer ml-1"
-                                title="Clear sort"
-                            >
-                                ✕
-                            </button>
-                            )}
+                            </div>
                         </div>
                         {taskList?.tasks && taskList.tasks.length > 0 && taskList.tasks.map(task => (
                             <div key={task.id} className="relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 w-full mb-3">
@@ -232,10 +241,12 @@ export default function Tasks() {
                                         className="text-slate-800 flex w-full flex-col sm:flex-row sm:items-center rounded-md p-2 sm:p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 gap-2"
                                     >
                                         <div className="flex items-center gap-2 w-full">
-                                            <PriorityDropdown
-                                                priority={task.priority}
-                                                onChange={(value) => handleEditStatusPriority(task.id, value, true)}
-                                            />
+                                            <div className="w-24 flex-shrink-0">
+                                                <PriorityDropdown
+                                                    priority={task.priority}
+                                                    onChange={(value) => handleEditStatusPriority(task.id, value, true)}
+                                                />
+                                            </div>
 
                                             <span className="flex-1 break-words text-sm sm:text-base cursor-pointer min-w-0" onClick={() => handleTitleClickAccordion(task.id)}>
                                                 <span className="text-base sm:text-lg md:text-xl font-bold">{task.title}</span>
@@ -245,7 +256,7 @@ export default function Tasks() {
                                         <div className="flex items-center gap-1 sm:gap-2 justify-end flex-shrink-0">
 
                                         <button
-                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none relative"
+                                            className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none relative w-28"
                                             type="button"
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -295,19 +306,24 @@ export default function Tasks() {
                                                 </div>
                                             )}
                                         </button>
-                                        <EditIconButton id={task.id} label="Edit task" onClick={handleEdit} />
-                                        <DeleteIconButton id={task.id} label="Delete task" onClick={handleDelete} />
+                                        <div className={task.status === 3 ? 'invisible' : ''}>
+                                            <EditIconButton id={task.id} label="Edit task" onClick={handleEdit} />
+                                        </div>
+                                            <DeleteIconButton id={task.id} label="Delete task" onClick={handleDelete} />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-center -mt-8">
                                         <button
                                             className="flex-shrink-0 rounded-md border border-transparent p-1.5 sm:p-2 text-center text-sm transition-all text-slate-600 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                                             type="button"
                                             onClick={() => handleTitleClickAccordion(task.id)}
                                             aria-label="Expand task description"
+                                            title="Click to expand/collapse details"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`w-5 h-5 transition-transform duration-300 ${expandedTaskIds.has(task.id) ? 'rotate-180' : ''}`}>
                                                 <path fillRule="evenodd" d="M12.53 16.97a.75.75 0 0 1-1.06 0l-7.5-7.5a.75.75 0 1 1 1.06-1.06L12 14.94l6.97-6.97a.75.75 0 1 1 1.06 1.06l-7.5 7.5Z" clipRule="evenodd" />
                                             </svg>
                                         </button>
-                                        </div>
                                     </div>
                                 </nav>
 
@@ -326,24 +342,32 @@ export default function Tasks() {
                             </div>
                         ))}
 
-                    </div>
+                        <div className="flex items-center justify-center gap-6 mt-6 mb-4">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}   
+                                disabled={currentPage === 1}
+                                className={`font-semibold text-lg transition-all ${
+                                    currentPage === 1 
+                                        ? "text-slate-400 cursor-not-allowed" 
+                                        : "text-slate-600 hover:text-teal-500 cursor-pointer"
+                                }`}
+                            >
+                                ← Previous
+                            </button>
+                            <span className="text-lg text-slate-600 font-medium">Page <span className="text-teal-500 font-bold">{currentPage}</span> of <span className="text-teal-500 font-bold">{totalPageCount}</span></span>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPageCount))}   
+                                disabled={currentPage === totalPageCount}
+                                className={`font-semibold text-lg transition-all ${
+                                    currentPage === totalPageCount 
+                                        ? "text-slate-400 cursor-not-allowed" 
+                                        : "text-slate-600 hover:text-teal-500 cursor-pointer"
+                                }`}
+                            >
+                                Next →
+                            </button>
+                        </div>
 
-                    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white border border-slate-200 rounded-md shadow-lg px-4 py-2 flex items-center gap-4">
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}   
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 bg-teal-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-teal-600 transition-all"
-                        >
-                            Previous
-                        </button>
-                        <span className="text-sm text-slate-700">Page {currentPage} of {totalPageCount}</span>
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPageCount))}   
-                            disabled={currentPage === totalPageCount}
-                            className="px-3 py-1 bg-teal-500 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-teal-600 transition-all"
-                        >
-                            Next
-                        </button>
                     </div>
                 </div>
             </div>

@@ -9,6 +9,7 @@ import TaskLists from "../pages/TaskLists"
 import UserProfile from "../pages/UserProfile"
 import ProtectedRoute from "../components/ProtectedRoute"
 import Tasks from "../pages/Tasks"
+import NotFound from "../pages/NotFound"
 
 export const router = createBrowserRouter([
   {
@@ -27,7 +28,8 @@ export const router = createBrowserRouter([
         { path: "tasks/:id", element: <Tasks /> },
         { path: "userprofile", element: <UserProfile /> }
          // add more protected routes here later
-     ] }
+     ] },
+      { path: "*", element: <NotFound /> }
     ]
   }
 ])

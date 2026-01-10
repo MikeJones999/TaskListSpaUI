@@ -102,10 +102,9 @@ export default function TaskLists() {
                             <nav className="flex w-full flex-col gap-1 p-2 sm:p-3">
 
                                 <div
-                                    role="button"
-                                    className="text-slate-800 flex w-full items-start rounded-md p-2 sm:p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 gap-2"
+                                    className="text-slate-800 flex w-full items-center rounded-md p-2 sm:p-3 gap-2"
                                 >
-                                    <span className="flex-1 break-words text-sm sm:text-base cursor-pointer" onClick={() => handleNavigation(taskList.id)}>
+                                    <span className="flex-1 break-words text-sm sm:text-base">
                                         <span className="flex items-center justify-between gap-2">
                                             <span className="text-base sm:text-lg md:text-xl font-bold">{taskList.title}</span>
                                         </span>
@@ -114,9 +113,18 @@ export default function TaskLists() {
 
                                     <div className="flex-shrink-0 flex items-center gap-2">
                                         <span className="text-xs sm:text-sm text-slate-600 whitespace-nowrap">Tasks - </span>
-                                        <span className="shrink-0 rounded-full bg-emerald-500 px-3 font-mono text-md font-medium tracking-tight text-white">
+                                        <span className="shrink-0 rounded-full bg-indigo-600 px-3 font-mono text-md font-medium tracking-tight text-white">
                                             {taskList.toDoItemCount}
                                         </span>
+                                        <button
+                                            onClick={() => handleNavigation(taskList.id)}
+                                            className="px-3 py-1.5 bg-teal-500 hover:bg-teal-600 text-white font-semibold text-sm rounded-md transition-all shadow flex items-center gap-1"
+                                        >
+                                            View Tasks
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                                                <path fillRule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 1 1 1.06-1.06l7.5 7.5Z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
                                         <EditIconButton id={taskList.id} label="Edit task list" onClick={handleEdit} />
                                         <DeleteIconButton id={taskList.id} label="Delete task list" onClick={handleDelete} />
                                     </div>
