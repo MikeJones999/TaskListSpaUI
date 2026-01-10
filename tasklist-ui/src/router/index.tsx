@@ -3,7 +3,7 @@ import Layout from "../Layout"
 import Home from "../pages/Home"
 import Login from "../pages/Login"
 import Logout from "../pages/Logout"
-// import Register from "../pages/Register"
+import Register from "../pages/Register"
 import Dashboard from "../pages/Dashboard"
 import TaskLists from "../pages/TaskLists"
 // import UserProfile from "../pages/UserProfile"
@@ -17,7 +17,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
-    //   { path: "register", element: <Register /> },
+      { path: "register", element: <Register /> },
      { 
       element: <ProtectedRoute />, 
       children: [ 
