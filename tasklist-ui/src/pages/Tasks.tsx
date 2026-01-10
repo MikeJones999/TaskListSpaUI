@@ -33,6 +33,7 @@ export default function Tasks() {
             const data = await apiRequest<ResponseDto<TaskList>>(`ToDoLists/${id}`, { method: "GET", token: token || undefined });
             if (data.success && data.responseData) {
                 setTaskList(data.responseData);
+                console.log("Fetched task list:", data.responseData);
             }
         } catch (error) {
             console.error("Error fetching task list:", error);
@@ -250,6 +251,10 @@ export default function Tasks() {
                                             <h3 className="text-xs font-bold uppercase tracking-widest text-slate-600 mb-2">Description:</h3>
                                             <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap break-words">{task.description || "No description provided"}</p>
                                         </div>
+                                        {task.status == 3 && <div className="mb-2">
+                                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-600 mb-2">Completed Date:</h3>
+                                            <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap break-words">{task.completedOnDate ? new Date(task.completedOnDate).toLocaleDateString() : "No Date provided"}</p>
+                                        </div>}
                                     </div>
                                 )}
                             </div>

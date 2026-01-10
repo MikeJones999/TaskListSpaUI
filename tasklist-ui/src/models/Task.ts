@@ -6,4 +6,5 @@ export interface Task {
     description: string;
     type: string;
     toDoListId: number;
+    completedOnDate?: Date;
 }
