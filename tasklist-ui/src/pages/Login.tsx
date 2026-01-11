@@ -80,7 +80,7 @@ export default function Login() {
                     <button onClick={handleSubmit} className="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">Login</button>
 
                 </div>
-                <p className="mt-3 text-slate-300">Please enter you credentials to login.</p>
+                <p className="mt-3 text-slate-300">Please enter your credentials to login.</p>
                 <p className="mt-2 text-sm text-slate-400">Don't have an account? <a href="/register" className="text-teal-400 hover:underline">Register here</a></p>
             
                 <p className="mt-3 text-slate-300 font-bold">Test User: Ali@Imparta.com - Password: Password12345!</p>
