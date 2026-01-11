@@ -3,14 +3,8 @@ import { apiRequest } from "../services/apiService";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast"
 import ToastWrapper from "../components/toastWrapper";
-
-interface RegisterFormData {
-    "userName": string
-    "displayName": string,
-    "email": string,
-    "password": string,
-    "confirmPassword": string
-}
+import type { RegisterFormData } from "../models/RegisterFormData";
+import RegisterUserValidationHelper from "../utils/RegisterUserValidationHelper";
 
 interface RegisterResponse {
     errors: RegisterErrors,
@@ -34,8 +28,9 @@ export default function Register() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if(formData.password !== formData.confirmPassword) {
-            toast.error("Passwords do not match.");
+        const validationResult =  RegisterUserValidationHelper(formData);
+        if (validationResult.isError) {
+            toast.error(validationResult.text);
             return;
         }
 
@@ -52,8 +47,7 @@ export default function Register() {
                     skipErrorHandling: true
                  });
 
-                //console.log("Register response:", result)   
-                  
+                //console.log("Register response:", result)                     
                 if (result.isSuccessful) {
                     setFormData({ userName: "", displayName: "", email: "", password: "", confirmPassword: "" });   
                     toast.success("Registration successful!");
