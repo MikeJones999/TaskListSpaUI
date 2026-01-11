@@ -14,7 +14,6 @@ export default function DeleteTaskListConfirmationModal({ onClose, onSuccess: on
 
     const handleDeletion = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        console.log("Deleting task list with ID:", item.id);
         
         try {
             const result = await apiRequest<DeleteResponseDto>(`ToDoLists/${item.id}`, { 

@@ -25,9 +25,7 @@ export default function CreateTaskListModal({ onClose, onSuccess: onSuccessRefre
         e.preventDefault();
 
         try {
-            const token = tokenService.getAccessToken();
-            console.log("Using token:", token);
-            console.log("Form data to submit:", formData);
+            const token = tokenService.getAccessToken();          
             
             const response = await apiRequest<ResponseDto>("ToDoLists", { 
                 method: "POST", 
@@ -43,7 +41,6 @@ export default function CreateTaskListModal({ onClose, onSuccess: onSuccessRefre
                 return;
             }
             
-            console.log("Response:", response);
             toast.success("Task list created successfully!");
             await onSuccessRefreshLists();
             onClose();

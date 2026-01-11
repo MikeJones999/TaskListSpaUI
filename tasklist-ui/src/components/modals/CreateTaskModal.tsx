@@ -30,8 +30,6 @@ export default function CreateTaskModal({ onClose, onSuccess: onSuccessRefreshLi
 
             try {
                 const token = tokenService.getAccessToken();
-                console.log("Using token:", token);
-                console.log("Form data to submit:", formData);
 
                 const response = await apiRequest<TaskRelatedResponseDto>("ToDoItems", {
                     method: "POST",
@@ -51,7 +49,6 @@ export default function CreateTaskModal({ onClose, onSuccess: onSuccessRefreshLi
                     return;
                 }
 
-                console.log("Response:", response);
                 toast.success("Task created successfully!");
                 await onSuccessRefreshLists();
                 onClose();

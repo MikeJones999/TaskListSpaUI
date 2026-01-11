@@ -58,7 +58,7 @@ export default function UserProfilePage() {
         return;
       }
       toast.success("Image uploaded successfully.");
-      console.log("Upload response:", response.responseData);
+      //console.log("Upload response:", response.responseData);
       setSelectedFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
       await refetch();

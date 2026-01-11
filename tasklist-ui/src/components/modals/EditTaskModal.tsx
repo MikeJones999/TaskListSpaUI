@@ -24,9 +24,8 @@ export default function EditTaskModal({ item, listId, onClose, onSuccess: onSucc
             e.preventDefault();
 
             try {
-                const token = tokenService.getAccessToken();
-                console.log("Using token:", token);
-                console.log("Form data to submit:", formData);
+                const token = tokenService.getAccessToken();                
+                //console.log("Form data to submit:", formData);
 
                 const response = await apiRequest<TaskRelatedResponseDto>(`ToDoItems/${item.id}`, {
                     method: "PUT",

@@ -40,7 +40,7 @@ export default function Tasks() {
             if (sortBy) {
                 params.append("sortBy", sortBy);
                 params.append("ascending", sortDirection.toString());
-                console.log("Sorting by:", sortBy, "ascending:", sortDirection);
+                //console.log("Sorting by:", sortBy, "ascending:", sortDirection);
             }
             params.append("pageNumber", pageNumber.toString());
 

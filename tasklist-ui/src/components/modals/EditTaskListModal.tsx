@@ -28,8 +28,7 @@ export default function EditTaskListModal({ item, onClose, onSuccess: onSuccessR
         e.preventDefault();
 
         try {
-            const token = tokenService.getAccessToken();
-            console.log("Using token:", token);
+            const token = tokenService.getAccessToken();            
             console.log("Form data to submit:", formData);
 
             const response = await apiRequest<ResponseDto>(`ToDoLists/${item.id}`, {
